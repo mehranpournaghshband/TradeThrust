@@ -1000,7 +1000,7 @@ class TradeThrustCommercial:
                     'resistance_level': resistance_level,
                     'volume_ratio': current_volume / avg_volume,
                     'breakout_strength': ((current_price - resistance_level) / resistance_level) * 100,
-                    'days_ago': (datetime.now() - recent_data.index[i].to_pydatetime()).days
+                    'days_ago': (datetime.now().date() - recent_data.index[i].date()).days
                 })
         
         if breakouts_found:
@@ -1292,7 +1292,7 @@ class TradeThrustCommercial:
                 return {
                     'price': last_breakout['price'],
                     'date': last_breakout['date'],
-                    'days_ago': (datetime.now() - last_breakout['date'].to_pydatetime()).days,
+                    'days_ago': (datetime.now().date() - last_breakout['date'].date()).days,
                     'volume_ratio': last_breakout['volume_ratio'],
                     'breakout_strength': last_breakout['breakout_strength'],
                     'type': 'breakout'
@@ -1322,7 +1322,7 @@ class TradeThrustCommercial:
                     return {
                         'price': last_pivot['price'],
                         'date': last_pivot['date'],
-                        'days_ago': (datetime.now() - last_pivot['date'].to_pydatetime()).days,
+                        'days_ago': (datetime.now().date() - last_pivot['date'].date()).days,
                         'type': 'pivot_high'
                     }
                 else:
@@ -1331,15 +1331,16 @@ class TradeThrustCommercial:
                     return {
                         'price': recent_data.loc[max_idx, 'High'],
                         'date': max_idx,
-                        'days_ago': (datetime.now() - max_idx.to_pydatetime()).days,
+                        'days_ago': (datetime.now().date() - max_idx.date()).days,
                         'type': 'recent_high'
                     }
             
         except Exception as e:
+            max_date = data['High'].idxmax()
             return {
                 'price': data['High'].max(),
-                'date': data['High'].idxmax(),
-                'days_ago': None,
+                'date': max_date,
+                'days_ago': (datetime.now().date() - max_date.date()).days if max_date else None,
                 'type': 'fallback',
                 'error': str(e)
             }
