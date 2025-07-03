@@ -105,20 +105,42 @@ class TradeThrustCompleteAlgorithm:
     
     def _fetch_real_data(self, symbol: str) -> Optional[pd.DataFrame]:
         """
-        🚨 CRITICAL FIX: Fetch REAL stock data using yfinance
-        No more fake data generation!
+        🚨 CRITICAL FIX: Fetch REAL stock data using yfinance with robust error handling
         """
         try:
             print(f"📡 Fetching REAL data for {symbol}...")
             
-            # Get stock data
+            # Create ticker with proper headers to avoid API issues
             ticker = yf.Ticker(symbol)
+            ticker.session.headers.update({
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            })
             
-            # Get 2 years of data for proper analysis
-            data = ticker.history(period='2y', interval='1d')
+            # Try multiple data periods (fallback approach)
+            data = None
+            periods = ['1y', '2y', '6mo', '3mo']  # Start with 1y, fallback to shorter periods
             
-            if data.empty:
-                print(f"❌ No data available for {symbol}")
+            for period in periods:
+                try:
+                    print(f"   Trying {period} period...")
+                    data = ticker.history(period=period, interval='1d')
+                    
+                    if not data.empty and len(data) >= 100:  # Need at least 100 days for analysis
+                        print(f"✅ SUCCESS: Got {len(data)} days with {period} period")
+                        break
+                    elif not data.empty:
+                        print(f"   Got {len(data)} days but need more, trying longer period...")
+                        continue
+                    else:
+                        print(f"   No data with {period}, trying next...")
+                        continue
+                        
+                except Exception as e:
+                    print(f"   Error with {period}: {str(e)[:50]}...")
+                    continue
+            
+            if data is None or data.empty:
+                print(f"❌ No data available for {symbol} with any period")
                 return None
             
             # Calculate technical indicators
@@ -126,27 +148,30 @@ class TradeThrustCompleteAlgorithm:
             data['SMA_150'] = data['Close'].rolling(window=150, min_periods=1).mean()
             data['SMA_200'] = data['Close'].rolling(window=200, min_periods=1).mean()
             
-            # 52-week high/low
-            data['52W_High'] = data['High'].rolling(window=252, min_periods=1).max()
-            data['52W_Low'] = data['Low'].rolling(window=252, min_periods=1).min()
+            # 52-week high/low (or available period)
+            window_52w = min(252, len(data))  # Use available data if less than 252 days
+            data['52W_High'] = data['High'].rolling(window=window_52w, min_periods=1).max()
+            data['52W_Low'] = data['Low'].rolling(window=window_52w, min_periods=1).min()
             
             # Average volume
             data['Avg_Volume_50'] = data['Volume'].rolling(window=50, min_periods=1).mean()
             
             # Relative Strength (simplified calculation)
-            # In real implementation, this would compare to market index
             returns_20d = data['Close'].pct_change(20)
             data['RS_Rating'] = ((returns_20d.rank(pct=True) * 100).fillna(50)).clip(0, 100)
             
             print(f"✅ SUCCESS: Loaded {len(data)} days of REAL data")
-            print(f"   Date range: {data.index[0].date()} to {data.index[-1].date()}")
+            print(f"   Date range: {data.index[0].strftime('%Y-%m-%d')} to {data.index[-1].strftime('%Y-%m-%d')}")
             print(f"   Current price: ${data['Close'].iloc[-1]:.2f}")
             
             return data
             
         except Exception as e:
             print(f"❌ Error fetching real data for {symbol}: {e}")
-            print("💡 Make sure you have internet connection and valid symbol")
+            print("💡 Troubleshooting tips:")
+            print("   - Check internet connection")
+            print("   - Verify symbol is correct (e.g., IBM, AAPL)")
+            print("   - Try again in a few minutes (API rate limit)")
             return None
     
     def _trend_template_complete(self, data: pd.DataFrame, symbol: str) -> Dict:
