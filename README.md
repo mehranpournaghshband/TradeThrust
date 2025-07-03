@@ -201,3 +201,4 @@ This project is for educational purposes. Please respect the educational nature 
 ---
 
 **Remember**: This tool helps you learn and apply Mehran's criteria systematically, but successful trading requires practice, discipline, and continuous learning. Always manage your risk appropriately!
+# TradeThrust
