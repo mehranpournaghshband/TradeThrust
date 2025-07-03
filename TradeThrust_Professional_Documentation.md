@@ -8,7 +8,7 @@ TradeThrust Professional v2.0 represents a major enhancement to the original Tra
 
 ### 1. Professional Table Formatting
 - **Organized Data Display**: All analysis criteria presented in clean, readable tables
-- **Current vs Target Comparison**: Side-by-side comparison of actual values against Minervini requirements
+- **Current vs Target Comparison**: Side-by-side comparison of actual values against TradeThrust requirements
 - **Status Indicators**: Clear ✅ PASS / ❌ FAIL status for each criterion
 - **Detailed Reasoning**: Explanation of WHY each criterion passes or fails
 
@@ -26,14 +26,14 @@ TradeThrust Professional v2.0 represents a major enhancement to the original Tra
 
 ### 3. Phase-by-Phase Analysis Structure
 
-#### Phase 1: Minervini Trend Template Analysis
+#### Phase 1: TradeThrust Trend Template Analysis
 ```
 Criterion                 Current      Target       Status   Reasoning
 ─────────────────────────────────────────────────────────────────────────
 Price Above 50-day SMA    $192.53      >$189.45     ✅ PASS  Price is +1.6% vs 50 SMA
 Price Above 150-day SMA   $192.53      >$175.30     ✅ PASS  Price is +9.8% vs 150 SMA
 ```
-- **All 8 Criteria Evaluated**: Complete Minervini trend template analysis
+- **All 8 Criteria Evaluated**: Complete TradeThrust trend template analysis
 - **Percentage Calculations**: Exact percentage above/below each moving average
 - **Score Summary**: Clear scoring system (e.g., 8/8 - STRONG TREND)
 

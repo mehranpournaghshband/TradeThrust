@@ -4,7 +4,7 @@ TradeThrust Professional - Enhanced Output Version
 =================================================
 
 Professional stock analysis with enhanced formatting, detailed explanations,
-and exact buy/sell price recommendations based on Mark Minervini's methodology.
+and exact buy/sell price recommendations based on TradeThrust methodology.
 
 Features:
 - Professional table formatting
@@ -142,12 +142,12 @@ class TradeThrustProfessional:
         print("\n" + "═" * 80)
         print(f"🚀 TRADETHRUST PROFESSIONAL ANALYSIS")
         print(f"📊 Symbol: {symbol} | Analysis Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print("📚 Based on Mark Minervini's Championship Trading Methodology")
+        print("📚 Based on TradeThrust Professional Trading Methodology")
         print("═" * 80)
     
     def _analyze_trend_template(self, data: pd.DataFrame, symbol: str) -> Dict:
         """Phase 1: Comprehensive trend template analysis with professional formatting"""
-        print(f"\n📊 PHASE 1: MINERVINI TREND TEMPLATE ANALYSIS")
+        print(f"\n📊 PHASE 1: TRADETHRUST TREND TEMPLATE ANALYSIS")
         print("─" * 60)
         
         latest = data.iloc[-1]
@@ -244,7 +244,7 @@ class TradeThrustProfessional:
         print(f"📊 TREND TEMPLATE SCORE: {passed_criteria}/8 - {trend_strength} TREND")
         
         if passed_criteria >= 6:
-            print("✅ Stock shows excellent trend characteristics per Minervini methodology")
+            print("✅ Stock shows excellent trend characteristics per TradeThrust methodology")
         elif passed_criteria >= 4:
             print("⚠️  Stock shows mixed trend signals - proceed with caution")
         else:
