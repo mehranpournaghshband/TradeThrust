@@ -10,7 +10,7 @@ Features:
 - Enhanced Trend Template with detailed explanations
 - Advanced VCP analysis with confidence scoring
 - Professional breakout confirmation
-- Minervini Score (0-100)
+- TradeThrust Score (0-100)
 - Commercial-grade formatting
 - Peer comparison
 - Education boxes
@@ -23,6 +23,8 @@ Version: 4.0.0 (Commercial Enhanced)
 import yfinance as yf
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 import warnings
@@ -73,38 +75,38 @@ class TradeThrustCommercial:
         # Find pivot point information
         pivot_info = self._find_last_pivot_point(data)
         
-        # Calculate Minervini Score (0-100)
-        minervini_score = self._calculate_minervini_score(trend_results, vcp_results, breakout_results)
+        # Calculate TradeThrust Score (0-100)
+        tradethrust_score = self._calculate_tradethrust_score(trend_results, vcp_results, breakout_results)
         
         # Risk Management
         risk_results = self._enhanced_risk_management(data, trend_results, vcp_results, breakout_results)
         
         # Generate Enhanced Recommendation
         recommendation = self._generate_commercial_recommendation(
-            trend_results, vcp_results, breakout_results, minervini_score, risk_results
+            trend_results, vcp_results, breakout_results, tradethrust_score, risk_results
         )
         
         if output_mode == "summary":
             # Display summary format
             self._display_summary_analysis(symbol, trend_results, vcp_results, breakout_results, 
-                                         minervini_score, recommendation, risk_results, pivot_info)
+                                         tradethrust_score, recommendation, risk_results, pivot_info)
         else:
             # Display detailed format (existing)
             self._display_commercial_scorecard(symbol, trend_results, vcp_results, breakout_results, 
-                                             minervini_score, recommendation)
+                                             tradethrust_score, recommendation)
             
-            # Find and display peer comparison
-            peer_analysis = self._get_peer_comparison(symbol, minervini_score)
+            # Generate and display chart for detailed mode
+            self._display_chart(symbol, data, trend_results, pivot_info)
             
-            # Display education boxes
+            # Display education boxes (but not peer recommendations)
             self._display_education_boxes(trend_results, vcp_results, breakout_results)
             
             # Final commercial summary
-            self._display_commercial_summary(symbol, recommendation, minervini_score, peer_analysis)
+            self._display_commercial_summary(symbol, recommendation, tradethrust_score)
         
         return {
             'symbol': symbol,
-            'minervini_score': minervini_score,
+            'tradethrust_score': tradethrust_score,
             'trend_results': trend_results,
             'vcp_results': vcp_results,
             'breakout_results': breakout_results,
@@ -673,9 +675,9 @@ class TradeThrustCommercial:
             }
         }
     
-    def _calculate_minervini_score(self, trend_results: Dict, vcp_results: Dict, breakout_results: Dict) -> int:
+    def _calculate_tradethrust_score(self, trend_results: Dict, vcp_results: Dict, breakout_results: Dict) -> int:
         """
-        Calculate comprehensive Minervini Score (0-100)
+        Calculate comprehensive TradeThrust Score (0-100)
         """
         score = 0
         
@@ -692,6 +694,72 @@ class TradeThrustCommercial:
         score += breakout_score
         
         return int(round(score))
+    
+    def _display_chart(self, symbol: str, data: pd.DataFrame, trend_results: Dict, pivot_info: Dict):
+        """Display professional chart with technical analysis"""
+        try:
+            plt.style.use('seaborn-v0_8-darkgrid')
+            fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10), 
+                                          gridspec_kw={'height_ratios': [3, 1]})
+            
+            # Get recent data for chart (last 6 months)
+            recent_data = data.tail(120)
+            dates = recent_data.index
+            
+            # Price chart
+            ax1.plot(dates, recent_data['Close'], linewidth=2, color='#2E86AB', label='Price')
+            ax1.plot(dates, recent_data['SMA_50'], linewidth=1.5, color='#A23B72', label='50-day SMA')
+            ax1.plot(dates, recent_data['SMA_150'], linewidth=1.5, color='#F18F01', label='150-day SMA')
+            ax1.plot(dates, recent_data['SMA_200'], linewidth=1.5, color='#C73E1D', label='200-day SMA')
+            
+            # Mark pivot point
+            if pivot_info.get('date') and pivot_info.get('price'):
+                try:
+                    pivot_date = pivot_info['date']
+                    pivot_price = pivot_info['price']
+                    ax1.scatter([pivot_date], [pivot_price], color='red', s=100, marker='v', 
+                              label=f'Last Pivot: ${pivot_price:.2f}', zorder=5)
+                except:
+                    pass
+            
+            # Current price line
+            current_price = recent_data['Close'].iloc[-1]
+            ax1.axhline(y=current_price, color='blue', linestyle='--', alpha=0.7, 
+                       label=f'Current: ${current_price:.2f}')
+            
+            ax1.set_title(f'{symbol} - TradeThrust Technical Analysis', fontsize=16, fontweight='bold')
+            ax1.set_ylabel('Price ($)', fontsize=12)
+            ax1.legend(loc='upper left')
+            ax1.grid(True, alpha=0.3)
+            
+            # Volume chart
+            ax2.bar(dates, recent_data['Volume'], color='lightblue', alpha=0.7)
+            ax2.plot(dates, recent_data['Avg_Volume_50'], color='red', linewidth=2, label='50-day Avg Volume')
+            ax2.set_ylabel('Volume', fontsize=12)
+            ax2.set_xlabel('Date', fontsize=12)
+            ax2.legend()
+            ax2.grid(True, alpha=0.3)
+            
+            # Format dates
+            ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+            ax2.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+            fig.autofmt_xdate()
+            
+            plt.tight_layout()
+            plt.show()
+            
+            print(f"\n📈 TECHNICAL CHART DISPLAYED")
+            print(f"✅ Chart shows price action, moving averages, and volume")
+            if pivot_info.get('date'):
+                print(f"📍 Last pivot point marked at ${pivot_info['price']:.2f} on {pivot_info['date'].strftime('%Y-%m-%d')}")
+            
+        except Exception as e:
+            print(f"\n📈 CHART DISPLAY")
+            print(f"⚠️  Chart display not available: {e}")
+            print(f"💡 Install matplotlib for chart visualization: pip install matplotlib")
+            print(f"📊 Current Price: ${data['Close'].iloc[-1]:.2f}")
+            if pivot_info.get('price'):
+                print(f"📍 Last Pivot: ${pivot_info['price']:.2f}")
     
     def _enhanced_risk_management(self, data: pd.DataFrame, trend_results: Dict, 
                                  vcp_results: Dict, breakout_results: Dict) -> Dict:
@@ -737,22 +805,22 @@ class TradeThrustCommercial:
         }
     
     def _generate_commercial_recommendation(self, trend_results: Dict, vcp_results: Dict, 
-                                          breakout_results: Dict, minervini_score: int, 
+                                          breakout_results: Dict, tradethrust_score: int, 
                                           risk_results: Dict) -> Dict:
         """Generate commercial-grade recommendation"""
         
         # Determine recommendation based on comprehensive analysis
-        if minervini_score >= 80 and trend_results['passed'] and breakout_results['confirmed']:
+        if tradethrust_score >= 80 and trend_results['passed'] and breakout_results['confirmed']:
             recommendation = "🟢 STRONG BUY"
             action = "EXECUTE IMMEDIATELY"
             confidence = "HIGH"
             color_code = "GREEN"
-        elif minervini_score >= 65 and trend_results['passed']:
+        elif tradethrust_score >= 65 and trend_results['passed']:
             recommendation = "🟡 WATCH LIST"
             action = "MONITOR CLOSELY"
             confidence = "MEDIUM"
             color_code = "YELLOW"
-        elif minervini_score >= 40:
+        elif tradethrust_score >= 40:
             recommendation = "🟡 MONITOR"
             action = "WAIT FOR SETUP"
             confidence = "LOW"
@@ -768,36 +836,35 @@ class TradeThrustCommercial:
             'action': action,
             'confidence': confidence,
             'color_code': color_code,
-            'minervini_score': minervini_score
+            'tradethrust_score': tradethrust_score
         }
     
     def _display_commercial_scorecard(self, symbol: str, trend_results: Dict, vcp_results: Dict, 
-                                    breakout_results: Dict, minervini_score: int, recommendation: Dict):
+                                    breakout_results: Dict, tradethrust_score: int, recommendation: Dict):
         """Display professional scorecard format"""
         print(f"\n╔═════════ {symbol}: TradeThrust Commercial Scorecard ═════════╗")
         print(f"║ 📊 Trend Template:        {trend_results['score']}/{trend_results['total']} ({'✅ PASS' if trend_results['passed'] else '❌ FAIL'})         ║")
         print(f"║ 📈 VCP Detected:          {vcp_results['quality']} ({vcp_results['confidence']}%)   ║")
         print(f"║ 🎯 Breakout Confirmed:    {'✅ YES' if breakout_results['confirmed'] else '❌ NO'}                  ║")
-        print(f"║ 🏆 Minervini Score:       {minervini_score}/100                    ║")
+        print(f"║ 🏆 TradeThrust Score:     {tradethrust_score}/100                    ║")
         print(f"║ 🎯 Final Recommendation:  {recommendation['recommendation']}            ║")
         print("╚═══════════════════════════════════════════════════╝")
     
-    def _get_peer_comparison(self, symbol: str, minervini_score: int) -> Dict:
-        """Get peer comparison analysis"""
-        # Simplified peer comparison (in real implementation, would analyze peer stocks)
+    def _get_peer_comparison(self, symbol: str, tradethrust_score: int) -> Dict:
+        """Get peer comparison analysis - Removed stock recommendations per user request"""
+        # Focus only on the analyzed stock, no other stock recommendations
         sector_map = {
             'AAPL': 'TECH', 'MSFT': 'TECH', 'GOOGL': 'TECH', 'AMZN': 'TECH',
             'JPM': 'FINANCE', 'BAC': 'FINANCE', 'WFC': 'FINANCE',
             'JNJ': 'HEALTHCARE', 'PFE': 'HEALTHCARE'
         }
         
-        sector = sector_map.get(symbol, 'TECH')
-        peer_stocks = self.peer_stocks.get(sector, ['AAPL', 'MSFT', 'GOOGL'])[:3]
+        sector = sector_map.get(symbol, 'GENERAL')
         
         return {
             'sector': sector,
-            'similar_stocks': peer_stocks,
-            'relative_ranking': 'TOP 25%' if minervini_score >= 75 else 'AVERAGE' if minervini_score >= 50 else 'BOTTOM 25%'
+            'focus': f'Analysis focused on {symbol} only',
+            'relative_ranking': 'TOP 25%' if tradethrust_score >= 75 else 'AVERAGE' if tradethrust_score >= 50 else 'BOTTOM 25%'
         }
     
     def _display_education_boxes(self, trend_results: Dict, vcp_results: Dict, breakout_results: Dict):
@@ -808,23 +875,27 @@ class TradeThrustCommercial:
         print("📊 VCP Pattern: Series of narrowing price contractions showing institutional accumulation")
         print("🎯 Breakout: Price breaking above resistance with volume confirms new leg up")
     
-    def _display_commercial_summary(self, symbol: str, recommendation: Dict, minervini_score: int, peer_analysis: Dict):
+    def _display_commercial_summary(self, symbol: str, recommendation: Dict, tradethrust_score: int):
         """Display final commercial summary"""
-        print(f"\n🎯 COMMERCIAL SUMMARY FOR {symbol}")
+        print(f"\n🎯 TRADETHRUST ANALYSIS SUMMARY FOR {symbol}")
         print("═" * 50)
-        print(f"📊 Minervini Score: {minervini_score}/100")
+        print(f"📊 TradeThrust Score: {tradethrust_score}/100")
         print(f"🏆 Recommendation: {recommendation['recommendation']}")
         print(f"🎬 Action: {recommendation['action']}")
         print(f"📈 Confidence: {recommendation['confidence']}")
-        print(f"🏭 Sector Ranking: {peer_analysis['relative_ranking']} in {peer_analysis['sector']}")
-        print(f"👥 Similar Stocks: {', '.join(peer_analysis['similar_stocks'])}")
         
-        # Add chart link placeholder
-        print(f"\n🔗 Chart Analysis: [View Detailed Chart](https://tradethrust.com/chart/{symbol})")
-        print(f"📊 Full Report: [Download PDF](https://tradethrust.com/report/{symbol})")
+        # Focus on the analyzed stock only, no other recommendations
+        if tradethrust_score >= 80:
+            print(f"🎯 Analysis: {symbol} meets all TradeThrust criteria for potential investment")
+        elif tradethrust_score >= 65:
+            print(f"🎯 Analysis: {symbol} shows promise but requires closer monitoring")
+        elif tradethrust_score >= 40:
+            print(f"🎯 Analysis: {symbol} has some positive signals but needs improvement")
+        else:
+            print(f"🎯 Analysis: {symbol} does not currently meet TradeThrust investment criteria")
         
         print("═" * 50)
-        print("✅ Commercial Analysis Complete | TradeThrust Commercial v4.0")
+        print("✅ TradeThrust Analysis Complete | Professional-Grade Analysis v4.1")
     
     def _find_detailed_contractions(self, data: pd.DataFrame) -> List[Dict]:
         """Find detailed contractions for VCP analysis"""
@@ -861,9 +932,9 @@ class TradeThrustCommercial:
     def _print_commercial_header(self, symbol: str, output_mode: str):
         """Print commercial header"""
         print("\n" + "═" * 80)
-        print(f"🚀 TRADETHRUST COMMERCIAL EDITION")
+        print(f"🚀 TRADETHRUST COMMERCIAL ENHANCED EDITION")
         print(f"📊 Advanced Analysis for {symbol} | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print("🏆 Professional-Grade Stock Analysis with Minervini Methodology")
+        print("🏆 Professional-Grade Stock Analysis with TradeThrust Methodology")
         print("═" * 80)
     
     def _ask_output_preference(self) -> str:
@@ -887,53 +958,99 @@ class TradeThrustCommercial:
                 return "detailed"
     
     def _find_last_pivot_point(self, data: pd.DataFrame) -> Dict:
-        """Find the last significant pivot point"""
+        """Find the last significant breakout/pivot point"""
         try:
-            # Look for pivot points (significant highs) in the last 60 days
-            recent_data = data.tail(60)
+            # Look for actual breakout points in the last 120 days (6 months)
+            recent_data = data.tail(120)
             
-            pivot_point = None
-            pivot_date = None
-            pivot_price = 0
+            breakout_points = []
             
-            # Find the highest high in the recent period
-            for i in range(5, len(recent_data) - 5):
-                current_price = recent_data.iloc[i]['High']
+            # Find potential breakout points where price broke above resistance with volume
+            for i in range(10, len(recent_data) - 5):
+                current_row = recent_data.iloc[i]
+                current_price = current_row['High']
+                current_volume = current_row['Volume']
                 
-                # Check if this is a local maximum
-                window_before = recent_data.iloc[i-5:i]['High']
-                window_after = recent_data.iloc[i+1:i+6]['High']
+                # Look at previous 10 days to establish resistance
+                previous_period = recent_data.iloc[i-10:i]
+                resistance_level = previous_period['High'].max()
+                avg_volume = previous_period['Volume'].mean()
                 
-                if (current_price >= window_before.max() and 
-                    current_price >= window_after.max() and
-                    current_price > pivot_price):
+                # Check if this is a breakout
+                if (current_price > resistance_level * 1.02 and  # 2% above resistance
+                    current_volume > avg_volume * 1.5):  # 50% above average volume
                     
-                    pivot_price = current_price
-                    pivot_date = recent_data.index[i]
-                    pivot_point = current_price
+                    # Verify it's a significant move
+                    breakout_points.append({
+                        'price': current_price,
+                        'date': recent_data.index[i],
+                        'volume_ratio': current_volume / avg_volume,
+                        'breakout_strength': (current_price - resistance_level) / resistance_level * 100
+                    })
             
-            if pivot_point is None:
-                # Fallback to the highest high in the period
-                max_idx = recent_data['High'].idxmax()
-                pivot_point = recent_data.loc[max_idx, 'High']
-                pivot_date = max_idx
-            
-            return {
-                'price': pivot_point,
-                'date': pivot_date,
-                'days_ago': (datetime.now() - pivot_date.to_pydatetime()).days if pivot_date else None
-            }
+            # Find the most recent significant breakout
+            if breakout_points:
+                # Sort by date and get the most recent
+                breakout_points.sort(key=lambda x: x['date'], reverse=True)
+                last_breakout = breakout_points[0]
+                
+                return {
+                    'price': last_breakout['price'],
+                    'date': last_breakout['date'],
+                    'days_ago': (datetime.now() - last_breakout['date'].to_pydatetime()).days,
+                    'volume_ratio': last_breakout['volume_ratio'],
+                    'breakout_strength': last_breakout['breakout_strength'],
+                    'type': 'breakout'
+                }
+            else:
+                # No breakouts found, find the most recent significant high
+                # Look for highs that held for at least 3 days
+                pivot_highs = []
+                for i in range(5, len(recent_data) - 5):
+                    current_price = recent_data.iloc[i]['High']
+                    
+                    # Check if this is a local maximum that held
+                    window_before = recent_data.iloc[i-5:i]['High']
+                    window_after = recent_data.iloc[i+1:i+6]['High']
+                    
+                    if (current_price >= window_before.max() and 
+                        current_price >= window_after.max()):
+                        
+                        pivot_highs.append({
+                            'price': current_price,
+                            'date': recent_data.index[i]
+                        })
+                
+                if pivot_highs:
+                    # Get the most recent pivot high
+                    last_pivot = max(pivot_highs, key=lambda x: x['date'])
+                    return {
+                        'price': last_pivot['price'],
+                        'date': last_pivot['date'],
+                        'days_ago': (datetime.now() - last_pivot['date'].to_pydatetime()).days,
+                        'type': 'pivot_high'
+                    }
+                else:
+                    # Fallback to overall high
+                    max_idx = recent_data['High'].idxmax()
+                    return {
+                        'price': recent_data.loc[max_idx, 'High'],
+                        'date': max_idx,
+                        'days_ago': (datetime.now() - max_idx.to_pydatetime()).days,
+                        'type': 'recent_high'
+                    }
             
         except Exception as e:
             return {
                 'price': data['High'].max(),
                 'date': data['High'].idxmax(),
                 'days_ago': None,
+                'type': 'fallback',
                 'error': str(e)
             }
     
     def _display_summary_analysis(self, symbol: str, trend_results: Dict, vcp_results: Dict, 
-                                breakout_results: Dict, minervini_score: int, recommendation: Dict, 
+                                breakout_results: Dict, tradethrust_score: int, recommendation: Dict, 
                                 risk_results: Dict, pivot_info: Dict):
         """Display summary format analysis"""
         
@@ -1032,7 +1149,7 @@ class TradeThrustCommercial:
         print("-" * 80)
         
         # Determine action based on analysis
-        if minervini_score >= 80 and trend_results['passed'] and breakout_results['confirmed']:
+        if tradethrust_score >= 80 and trend_results['passed'] and breakout_results['confirmed']:
             action = "🟢 BUY NOW"
             reason = "All criteria met for TradeThrust strategy"
             next_steps = [
