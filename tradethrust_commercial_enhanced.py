@@ -142,21 +142,58 @@ class TradeThrustCommercial:
         }
     
     def fetch_stock_data(self, symbol: str, period: str = "2y") -> Optional[pd.DataFrame]:
-        """Enhanced data fetching with error handling"""
-        try:
-            ticker = yf.Ticker(symbol.upper())
-            data = ticker.history(period=period)
-            
-            if data.empty:
-                return None
-            
-            # Calculate enhanced indicators
-            data = self._calculate_enhanced_indicators(data, symbol)
-            return data
-            
-        except Exception as e:
-            print(f"❌ Error fetching data for {symbol}: {e}")
-            return None
+        """Enhanced data fetching with error handling and retry logic"""
+        import time
+        
+        symbol = symbol.upper()
+        print(f"🔄 Fetching data for {symbol}...")
+        
+        # Try different approaches
+        methods = [
+            {"period": "2y", "interval": "1d"},
+            {"period": "1y", "interval": "1d"},
+            {"period": "6mo", "interval": "1d"},
+            {"period": "3mo", "interval": "1d"}
+        ]
+        
+        for attempt, method in enumerate(methods, 1):
+            try:
+                print(f"   Attempt {attempt}: Trying {method['period']} period...")
+                
+                ticker = yf.Ticker(symbol)
+                data = ticker.history(period=method['period'], interval=method['interval'])
+                
+                if not data.empty and len(data) >= 50:  # Need at least 50 days for analysis
+                    print(f"   ✅ Successfully fetched {len(data)} days of data")
+                    
+                    # Calculate enhanced indicators
+                    data = self._calculate_enhanced_indicators(data, symbol)
+                    return data
+                elif not data.empty:
+                    print(f"   ⚠️ Only got {len(data)} days (need at least 50)")
+                else:
+                    print(f"   ❌ No data returned for {method['period']}")
+                
+                # Wait between attempts to avoid rate limiting
+                if attempt < len(methods):
+                    time.sleep(2)
+                    
+            except Exception as e:
+                print(f"   ❌ Attempt {attempt} failed: {str(e)[:100]}...")
+                if attempt < len(methods):
+                    time.sleep(2)
+                continue
+        
+        # All methods failed
+        print(f"\n❌ All data fetch attempts failed for {symbol}")
+        print("💡 This might be due to:")
+        print("   - Yahoo Finance API temporary issues")
+        print("   - Network connectivity problems") 
+        print("   - Invalid stock symbol")
+        print("   - Rate limiting (try again in a few minutes)")
+        print(f"   - Try a different symbol like AAPL, MSFT, or GOOGL")
+        
+        return None
     
     def _calculate_enhanced_indicators(self, data: pd.DataFrame, symbol: str) -> pd.DataFrame:
         """Calculate enhanced technical indicators"""
