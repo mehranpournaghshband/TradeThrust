@@ -3,11 +3,11 @@
 TradeThrust - Professional Stock Trading System
 ==============================================
 
-Advanced stock analysis and trading system based on Mark Minervini's proven methodology.
+Advanced stock analysis and trading system based on TradeThrust's proven methodology.
 Provides buy/sell signals, alerts, and portfolio management for serious traders.
 
 Features:
-- Complete Minervini Trend Template analysis
+- Complete TradeThrust Trend Template analysis
 - VCP (Volatility Contraction Pattern) detection
 - Real-time buy/sell alerts
 - Risk management tools
