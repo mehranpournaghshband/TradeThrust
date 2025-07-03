@@ -11,7 +11,7 @@ Instructions:
 2. Use the provided functions to analyze stocks
 3. Add stocks to watchlist and monitor for opportunities
 
-Based on Mark Minervini's proven trading methodology.
+Based on TradeThrust's proven trading methodology.
 """
 
 # Install required packages for Colab
@@ -70,7 +70,7 @@ class TradeThrustColab:
     
     def analyze_stock(self, symbol: str, show_chart: bool = True) -> Dict:
         """
-        Quick stock analysis with Minervini methodology
+        Quick stock analysis with TradeThrust methodology
         Perfect for Colab notebooks
         """
         symbol = symbol.upper()
@@ -91,8 +91,8 @@ class TradeThrustColab:
         except Exception as e:
             return {'error': f'Error fetching data: {e}'}
         
-        # Minervini Analysis
-        analysis = self._minervini_analysis(data, symbol)
+        # TradeThrust Analysis
+        analysis = self._tradethrust_analysis(data, symbol)
         
         # Store results
         self.analysis_results[symbol] = analysis
@@ -125,8 +125,8 @@ class TradeThrustColab:
         
         return df
     
-    def _minervini_analysis(self, data: pd.DataFrame, symbol: str) -> Dict:
-        """Core Minervini trend template analysis"""
+    def _tradethrust_analysis(self, data: pd.DataFrame, symbol: str) -> Dict:
+        """Core TradeThrust trend template analysis"""
         latest = data.iloc[-1]
         
         # Get current values
@@ -137,7 +137,7 @@ class TradeThrustColab:
         high_52w = latest['52W_High']
         low_52w = latest['52W_Low']
         
-        # Minervini Criteria Checks
+        # TradeThrust Criteria Checks
         criteria = {}
         
         # 1. Price above all SMAs
@@ -359,7 +359,7 @@ class TradeThrustColab:
 # Initialize TradeThrust for Colab
 print("🚀 TRADETHRUST COLAB EDITION")
 print("=" * 40)
-print("Ready to analyze stocks using Minervini's methodology!")
+print("Ready to analyze stocks using TradeThrust's methodology!")
 print("\nQuick Start:")
 print("1. tt = TradeThrustColab()")
 print("2. tt.analyze_stock('AAPL')  # Analyze Apple")

@@ -27,7 +27,7 @@ def print_header():
     print("🚀" + "=" * 60 + "🚀")
     print("               TRADETHRUST SETUP & DEMO")
     print("        Professional Stock Trading System")
-    print("      Based on Mark Minervini's Methodology")
+    print("      Based on TradeThrust's Methodology")
     print("🚀" + "=" * 60 + "🚀")
     print()
 
@@ -161,7 +161,7 @@ class TradeThrustDemo:
             latest = data.iloc[-1]
             price = latest['Close']
             
-            # Minervini criteria check
+            # TradeThrust criteria check
             criteria = {
                 'price_above_smas': price > latest['SMA_50'] and price > latest['SMA_150'] and price > latest['SMA_200'],
                 'sma_stacking': latest['SMA_50'] > latest['SMA_150'] > latest['SMA_200'],
@@ -284,7 +284,7 @@ def show_next_steps():
     
     steps = [
         "1. 📖 Read TradeThrust_README.md for complete documentation",
-        "2. 🎓 Study Mark Minervini's books for methodology background",
+        "2. 🎓 Study trading fundamentals for methodology background",
         "3. 💻 Try the Google Colab version: tradethrust_colab.py",
         "4. 🌐 Launch web interface: streamlit run tradethrust_web.py",
         "5. 📱 Run desktop app: python tradethrust.py",

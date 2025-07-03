@@ -53,17 +53,17 @@ def demo_analysis():
     print("-" * 40)
     
     for symbol, data in sample_stocks.items():
-        analysis = analyze_minervini_demo(symbol, data)
+        analysis = analyze_tradethrust_demo(symbol, data)
         print(f"{analysis['recommendation']} {analysis['symbol']}: ${analysis['price']:.2f}")
         print(f"   Score: {analysis['score']} | Volume: {analysis['volume_status']}")
         print(f"   {analysis['summary']}")
         print()
 
-def analyze_minervini_demo(symbol, data):
-    """Demo version of Minervini analysis"""
+def analyze_tradethrust_demo(symbol, data):
+    """Demo version of TradeThrust analysis"""
     price = data['price']
     
-    # Minervini Trend Template Criteria
+    # TradeThrust Trend Template Criteria
     criteria = {}
     
     # 1. Price above all SMAs
@@ -96,7 +96,7 @@ def analyze_minervini_demo(symbol, data):
     # Generate recommendation
     if score >= 3 and volume_surge:
         recommendation = "🟢 STRONG BUY"
-        summary = "Meets Minervini criteria with volume confirmation"
+        summary = "Meets TradeThrust criteria with volume confirmation"
     elif score >= 3:
         recommendation = "🟡 WATCH"
         summary = "Good setup, waiting for volume breakout"
@@ -127,8 +127,8 @@ def analyze_minervini_demo(symbol, data):
     }
 
 def show_methodology():
-    """Explain the Minervini methodology"""
-    print("🎓 MARK MINERVINI'S METHODOLOGY")
+    """Explain the TradeThrust methodology"""
+    print("🎓 TRADETHRUST METHODOLOGY")
     print("=" * 50)
     print()
     
@@ -181,7 +181,7 @@ def show_tradethrust_features():
     print()
     
     features = [
-        ("📊 Complete Analysis", "Full Minervini trend template automation"),
+        ("📊 Complete Analysis", "Full TradeThrust trend template automation"),
         ("🔍 VCP Detection", "Advanced pattern recognition for bases"),
         ("📈 Interactive Charts", "Professional technical analysis visualization"),
         ("📋 Watchlist Management", "Track and monitor multiple opportunities"),

@@ -454,10 +454,10 @@ class TradeThrust:
         latest_price = data.iloc[-1]['Close']
         
         # Phase 1: Trend Template Analysis
-        print("\n📊 PHASE 1: MINERVINI TREND TEMPLATE")
+        print("\n📊 PHASE 1: TRADETHRUST TREND TEMPLATE")
         print("-" * 40)
         
-        trend_results = self.check_minervini_trend_template(data)
+        trend_results = self.check_tradethrust_trend_template(data)
         phase1_score = 0
         phase1_total = 8
         
@@ -573,7 +573,7 @@ class TradeThrust:
             recommendation = "🟢 STRONG BUY"
             action = "BUY NOW"
             print(f"🎯 RECOMMENDATION: {recommendation}")
-            print("✅ This stock meets Minervini's strict criteria!")
+            print("✅ This stock meets TradeThrust's strict criteria!")
             print("✅ Strong trend + VCP base + breakout signal = High probability setup")
         elif overall_score >= 3 and phase1_pass:
             recommendation = "🟡 WATCH LIST"
@@ -585,7 +585,7 @@ class TradeThrust:
             recommendation = "🔴 AVOID"
             action = "HOLD/AVOID"
             print(f"❌ RECOMMENDATION: {recommendation}")
-            print("🚫 Does not meet Minervini's criteria")
+            print("🚫 Does not meet TradeThrust's criteria")
             print("⏳ Wait for better setup or look for other opportunities")
         
         # Create alerts if appropriate

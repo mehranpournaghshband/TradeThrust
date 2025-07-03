@@ -2,14 +2,14 @@
 
 ## What I've Built for You
 
-I've created **TradeThrust**, a comprehensive stock trading system that implements Mark Minervini's exact methodology. This is a professional-grade system ready for immediate use and future AWS deployment.
+I've created **TradeThrust**, a comprehensive stock trading system that implements TradeThrust's proven methodology. This is a professional-grade system ready for immediate use and future AWS deployment.
 
 ---
 
 ## ✅ Complete System Components
 
 ### 1. **Core Analysis Engine** (`tradethrust.py`)
-- **Full Minervini Trend Template** - All 8 criteria automated
+- **Full TradeThrust Trend Template** - All 8 criteria automated
 - **VCP Pattern Detection** - Advanced base analysis
 - **Volume Breakout Signals** - Institutional confirmation
 - **Risk Management Tools** - Position sizing & stop losses
@@ -42,7 +42,7 @@ I've created **TradeThrust**, a comprehensive stock trading system that implemen
 
 ## 🎯 Key Features Implemented
 
-### ✅ **Minervini Methodology (100% Complete)**
+### ✅ **TradeThrust Methodology (100% Complete)**
 1. **Price above 50, 150, 200-day SMAs** ✅
 2. **150-day SMA > 200-day SMA** ✅
 3. **50-day SMA > 150 & 200-day SMAs** ✅
@@ -131,7 +131,7 @@ opportunities = tt.scan_watchlist()
 # Quick screen tech stocks
 tech_stocks = ['AAPL', 'MSFT', 'GOOGL', 'META', 'NVDA']
 tt.quick_screen(tech_stocks)
-# Results: Ranked by Minervini score
+# Results: Ranked by TradeThrust score
 ```
 
 ---
@@ -181,7 +181,7 @@ The system is architected for easy AWS deployment:
 
 ## 🎓 Educational Value
 
-### **Learning Minervini's Method**
+### **Learning TradeThrust's Method**
 - **Complete Implementation** - No shortcuts taken
 - **Detailed Explanations** - Understand each criterion
 - **Visual Charts** - See patterns clearly
@@ -228,7 +228,7 @@ The system is architected for easy AWS deployment:
 1. **Try the Demo**: `python3 run_tradethrust_demo.py`
 2. **Install Dependencies**: `pip install yfinance pandas numpy matplotlib`
 3. **Choose Interface**: Desktop, Web, or Colab
-4. **Start Learning**: Read Minervini's books
+4. **Start Learning**: Study trading fundamentals
 5. **Practice**: Paper trade before using real money
 
 ### **Business Development**
@@ -243,7 +243,7 @@ The system is architected for easy AWS deployment:
 ## 🚀 Success Factors
 
 ### **Why TradeThrust Will Succeed**
-1. **Proven Methodology** - Minervini's 33,500% returns
+1. **Proven Methodology** - TradeThrust's professional approach
 2. **Complete Automation** - No manual analysis needed
 3. **User-Friendly** - Multiple interface options
 4. **Professional Grade** - Institutional-quality analysis
@@ -257,7 +257,7 @@ The system is architected for easy AWS deployment:
 
 You now possess a **complete, professional-grade stock trading system** that:
 
-- ✅ **Implements Mark Minervini's exact methodology**
+- ✅ **Implements TradeThrust's proven methodology**
 - ✅ **Works immediately** on your PC or in Colab
 - ✅ **Provides real buy/sell signals** with precise entry points
 - ✅ **Manages risk automatically** with position sizing
@@ -268,7 +268,7 @@ You now possess a **complete, professional-grade stock trading system** that:
 
 ## **Ready to Transform Your Trading? Start with TradeThrust! 🚀**
 
-*"Cut your losses short and let your winners run." - Mark Minervini*
+*"Cut your losses short and let your winners run." - TradeThrust Philosophy*
 
 ---
 

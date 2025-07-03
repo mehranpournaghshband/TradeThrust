@@ -88,7 +88,7 @@ Recommendation: Watch List
 
 ### TradeThrust Professional v2.0 Output:
 ```
-📊 PHASE 1: MINERVINI TREND TEMPLATE ANALYSIS
+📊 PHASE 1: TRADETHRUST TREND TEMPLATE ANALYSIS
 ────────────────────────────────────────────────────────────
 Criterion                 Current      Target       Status   Reasoning
 ────────────────────────────────────────────────────────────────────────────
@@ -112,7 +112,7 @@ Price Above 150-day SMA   $192.53      >$175.30     ✅ PASS  Price is +9.8% vs 
 
 ### 3. Educational Value
 - **Learn While Trading**: Each criterion explained with reasoning
-- **Methodology Transparency**: Complete Minervini implementation visible
+- **Methodology Transparency**: Complete TradeThrust implementation visible
 - **Risk Awareness**: Comprehensive risk management education
 
 ### 4. Professional Credibility
@@ -202,7 +202,7 @@ This tells the user:
 
 ### Investment Clubs
 - **Meeting Presentations**: Professional output suitable for group discussions
-- **Education Tool**: Learn Minervini methodology with clear explanations
+- **Education Tool**: Learn TradeThrust methodology with clear explanations
 - **Decision Documentation**: Complete reasoning for investment decisions
 
 ### Financial Advisors
@@ -211,7 +211,7 @@ This tells the user:
 - **Research Documentation**: Comprehensive analysis records
 
 ### Trading Educators
-- **Course Material**: Professional examples of Minervini analysis
+- **Course Material**: Professional examples of TradeThrust analysis
 - **Student Assignments**: Clear format for student analysis practice
 - **Methodology Teaching**: Step-by-step implementation examples
 
@@ -231,7 +231,7 @@ This tells the user:
 
 ## 📚 Educational Resources
 
-### Mark Minervini Methodology
+### TradeThrust Methodology
 - **Trend Template**: 8-point qualification system for stock selection
 - **VCP Pattern**: Volatility Contraction Pattern recognition
 - **Risk Management**: Position sizing and stop loss strategies
@@ -274,4 +274,4 @@ This represents the next generation of retail trading tools - bringing instituti
 
 **TradeThrust Professional v2.0** - *Where Professional Analysis Meets User-Friendly Design*
 
-*"Making Mark Minervini's proven methodology accessible to everyone, with professional presentation and exact action items."*
+*"Making TradeThrust's proven methodology accessible to everyone, with professional presentation and exact action items."*

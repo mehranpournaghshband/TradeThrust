@@ -15,10 +15,10 @@ def demo_professional_output():
     print("\n" + "═" * 80)
     print("🚀 TRADETHRUST PROFESSIONAL ANALYSIS")
     print("📊 Symbol: AAPL | Analysis Date: 2024-07-03 12:00:00")
-    print("📚 Based on Mark Minervini's Championship Trading Methodology")
+    print("📚 Based on TradeThrust's Championship Trading Methodology")
     print("═" * 80)
     
-    print("\n📊 PHASE 1: MINERVINI TREND TEMPLATE ANALYSIS")
+    print("\n📊 PHASE 1: TRADETHRUST TREND TEMPLATE ANALYSIS")
     print("─" * 60)
     
     print("Criterion                 Current      Target       Status   Reasoning")
@@ -33,7 +33,7 @@ def demo_professional_output():
     print("≤25% From 52W High        3.6%         ≤25%         ✅ PASS  Stock is 3.6% below 52W high of $199.62")
     print("─" * 95)
     print("📊 TREND TEMPLATE SCORE: 8/8 - STRONG TREND")
-    print("✅ Stock shows excellent trend characteristics per Minervini methodology")
+    print("✅ Stock shows excellent trend characteristics per TradeThrust methodology")
     
     print("\n📈 PHASE 2: VCP (VOLATILITY CONTRACTION PATTERN) ANALYSIS")
     print("─" * 60)
