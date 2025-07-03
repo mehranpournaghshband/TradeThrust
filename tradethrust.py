@@ -37,7 +37,7 @@ warnings.filterwarnings('ignore')
 
 class TradeThrust:
     """
-    Main TradeThrust trading system implementing Minervini's methodology
+    Main TradeThrust trading system implementing TradeThrust's methodology
     """
     
     def __init__(self, config_file: str = "tradethrust_config.json"):
@@ -101,7 +101,7 @@ class TradeThrust:
             return None
     
     def _calculate_all_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Calculate all technical indicators needed for Minervini analysis"""
+        """Calculate all technical indicators needed for TradeThrust analysis"""
         df = data.copy()
         
         # Simple Moving Averages
@@ -149,9 +149,9 @@ class TradeThrust:
         
         return rs_rating
     
-    def check_minervini_trend_template(self, data: pd.DataFrame) -> Dict:
+    def check_tradethrust_trend_template(self, data: pd.DataFrame) -> Dict:
         """
-        Complete Minervini Trend Template analysis
+        Complete TradeThrust Trend Template analysis
         Returns detailed results for each criterion
         """
         if data is None or len(data) < 252:
@@ -261,7 +261,7 @@ class TradeThrust:
     
     def detect_vcp_pattern(self, data: pd.DataFrame, weeks_back: int = 15) -> Dict:
         """
-        Detect Volatility Contraction Pattern (VCP) according to Minervini
+        Detect Volatility Contraction Pattern (VCP) according to TradeThrust
         """
         if data is None or len(data) < weeks_back * 5:
             return {'vcp_detected': False, 'error': 'Insufficient data'}
@@ -394,7 +394,7 @@ class TradeThrust:
         }
     
     def check_breakout_entry_signal(self, data: pd.DataFrame) -> Dict:
-        """Check for Minervini-style breakout entry signals"""
+        """Check for TradeThrust-style breakout entry signals"""
         if data is None or len(data) < 50:
             return {'breakout_signal': False, 'error': 'Insufficient data'}
         
@@ -441,7 +441,7 @@ class TradeThrust:
         }
     
     def analyze_stock_complete(self, symbol: str) -> Dict:
-        """Complete stock analysis using Minervini methodology"""
+        """Complete stock analysis using TradeThrust methodology"""
         print(f"\n🚀 TRADETHRUST ANALYSIS: {symbol.upper()}")
         print("=" * 60)
         
@@ -832,7 +832,7 @@ class TradeThrust:
 def main():
     """Main TradeThrust application interface"""
     print("🚀 Welcome to TradeThrust - Professional Trading System")
-    print("Based on Mark Minervini's proven methodology")
+    print("Based on TradeThrust's proven methodology")
     print("=" * 60)
     
     # Initialize TradeThrust

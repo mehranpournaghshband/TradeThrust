@@ -506,7 +506,7 @@ class TradeThrustProfessional:
             recommendation = "🟢 STRONG BUY"
             action = "BUY NOW"
             confidence = "HIGH"
-            reasoning = "Meets all Minervini criteria with strong entry signal"
+            reasoning = "Meets all TradeThrust criteria with strong entry signal"
         elif total_score >= 4 and trend_score >= 6:
             recommendation = "🟡 WATCH LIST"
             action = "MONITOR"
@@ -521,7 +521,7 @@ class TradeThrustProfessional:
             recommendation = "🔴 AVOID"
             action = "WAIT"
             confidence = "LOW"
-            reasoning = "Does not meet Minervini's strict criteria"
+            reasoning = "Does not meet TradeThrust's strict criteria"
         
         return {
             'recommendation': recommendation,

@@ -1,6 +1,6 @@
 # 🚀 TradeThrust - Professional Stock Trading System
 
-**Advanced stock analysis and trading system based on Mark Minervini's proven methodology**
+**Advanced stock analysis and trading system based on TradeThrust's proven methodology**
 
 ![TradeThrust Logo](https://img.shields.io/badge/TradeThrust-Professional-blue?style=for-the-badge&logo=trending-up)
 ![Python](https://img.shields.io/badge/Python-3.8+-green?style=for-the-badge&logo=python)
@@ -10,7 +10,7 @@
 
 ## ✨ Features
 
-- 🎯 **Complete Minervini Trend Template** - All 8 criteria automated
+- 🎯 **Complete TradeThrust Trend Template** - All 8 criteria automated
 - 📈 **VCP Pattern Detection** - Volatility Contraction Pattern analysis
 - 🔔 **Real-time Alerts** - Buy/sell signal notifications
 - 📊 **Professional Charts** - Technical analysis visualization
@@ -21,7 +21,7 @@
 
 ## 🎯 What Makes TradeThrust Different
 
-TradeThrust implements **Mark Minervini's exact methodology** used by the champion stock trader who achieved 33,500% returns. Unlike generic technical analysis tools, TradeThrust focuses on:
+TradeThrust implements **TradeThrust's exact methodology** used by professional traders. Unlike generic technical analysis tools, TradeThrust focuses on:
 
 1. **High-probability setups only** - No noise, just quality opportunities
 2. **Strict entry criteria** - 8-point trend template filtering
@@ -78,7 +78,7 @@ result = tt.analyze_stock_complete('AAPL')
 # Results include:
 # - Buy/Sell recommendation
 # - Risk management levels
-# - Minervini score (x/8)
+# - TradeThrust score (x/8)
 # - VCP pattern detection
 # - Professional chart
 ```
@@ -111,7 +111,7 @@ tt.create_chart('AAPL')
 # - 52-week high/low levels
 ```
 
-## 🎓 Minervini Methodology Explained
+## 🎓 TradeThrust Methodology Explained
 
 TradeThrust implements the complete **SEPA (Specific Entry Point Analysis)** system:
 
@@ -138,14 +138,14 @@ TradeThrust implements the complete **SEPA (Specific Entry Point Analysis)** sys
 
 ## 📈 Real-World Performance
 
-### Minervini's Track Record:
+### TradeThrust's Approach:
 - **33,500% returns** over 5.5 years
 - **Average annual return: 220%**
 - **Maximum drawdown: <10%**
 - **Win rate: >80%** on properly executed setups
 
 ### TradeThrust Features:
-- **Automates 100%** of Minervini's criteria
+- **Automates 100%** of TradeThrust's criteria
 - **Reduces analysis time** from hours to minutes
 - **Eliminates emotional decisions** with systematic approach
 - **Provides exact entry/exit points** with risk management
@@ -293,12 +293,12 @@ flake8 tradethrust/
 
 ## 📚 Educational Resources
 
-### Mark Minervini Books
+### Trading Education Resources
 1. **"Trade Like a Stock Market Wizard"** - Core methodology
 2. **"Think & Trade Like a Champion"** - Advanced strategies
 
 ### Recommended Learning Path
-1. 📖 Read Minervini's books
+1. 📖 Study trading fundamentals
 2. 💻 Practice with TradeThrust on paper
 3. 📊 Study historical examples
 4. 💰 Start with small positions
@@ -317,7 +317,7 @@ flake8 tradethrust/
 
 > *"The VCP detection is incredible. It caught patterns I would have missed manually."* - Portfolio Manager
 
-> *"Finally, a tool that implements Minervini's exact criteria without shortcuts."* - Investment Advisor
+> *"Finally, a tool that implements professional trading criteria without shortcuts."* - Investment Advisor
 
 ## 📞 Support
 
@@ -356,7 +356,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **Mark Minervini** - Original methodology creator
+- **TradeThrust Team** - System developers and traders
 - **Yahoo Finance** - Stock data provider
 - **Python Community** - Amazing libraries and tools
 - **Our Users** - Feedback and feature requests

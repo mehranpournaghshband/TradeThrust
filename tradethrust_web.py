@@ -4,7 +4,7 @@ TradeThrust Web Interface
 ========================
 
 Streamlit-based web application for TradeThrust stock analysis system.
-Provides a user-friendly web interface for analyzing stocks using Mark Minervini's methodology.
+Provides a user-friendly web interface for analyzing stocks using TradeThrust's methodology.
 
 Run with: streamlit run tradethrust_web.py
 
@@ -76,15 +76,15 @@ class TradeThrustWeb:
             st.error(f"Error fetching data for {symbol}: {e}")
             return None
     
-    def analyze_minervini(self, data: pd.DataFrame, symbol: str):
-        """Minervini trend template analysis"""
+    def analyze_tradethrust(self, data: pd.DataFrame, symbol: str):
+        """TradeThrust trend template analysis"""
         if data is None or len(data) < 200:
             return None
         
         latest = data.iloc[-1]
         price = latest['Close']
         
-        # Minervini criteria
+        # TradeThrust criteria
         criteria = {
             'price_above_smas': price > latest['SMA_50'] and price > latest['SMA_150'] and price > latest['SMA_200'],
             'sma_stacking': latest['SMA_50'] > latest['SMA_150'] > latest['SMA_200'],
@@ -202,7 +202,7 @@ def main():
     
     # Header
     st.title("🚀 TradeThrust - Professional Trading System")
-    st.markdown("*Advanced stock analysis based on Mark Minervini's proven methodology*")
+    st.markdown("*Advanced stock analysis based on TradeThrust's proven methodology*")
     
     # Sidebar
     st.sidebar.title("Navigation")
@@ -245,7 +245,7 @@ def stock_analysis_page():
                 data = st.session_state.tt_web.fetch_data(symbol, period)
                 
                 if data is not None:
-                    analysis = st.session_state.tt_web.analyze_minervini(data, symbol)
+                    analysis = st.session_state.tt_web.analyze_tradethrust(data, symbol)
                     
                     if analysis:
                         # Display results
@@ -255,7 +255,7 @@ def stock_analysis_page():
                             st.metric("Current Price", f"${analysis['price']:.2f}")
                         
                         with col2:
-                            st.metric("Minervini Score", analysis['score'])
+                            st.metric("TradeThrust Score", analysis['score'])
                         
                         with col3:
                             if analysis['color'] == 'success':
@@ -273,7 +273,7 @@ def stock_analysis_page():
                                 st.info(f"📊 Volume: {volume_text}")
                         
                         # Detailed criteria
-                        st.subheader("📋 Minervini Criteria Check")
+                        st.subheader("📋 TradeThrust Criteria Check")
                         
                         criteria_names = {
                             'price_above_smas': 'Price above all SMAs (50, 150, 200)',
@@ -372,7 +372,7 @@ def scan_watchlist():
         try:
             data = st.session_state.tt_web.fetch_data(symbol, "1y")
             if data is not None:
-                analysis = st.session_state.tt_web.analyze_minervini(data, symbol)
+                analysis = st.session_state.tt_web.analyze_tradethrust(data, symbol)
                 if analysis:
                     if "STRONG BUY" in analysis['recommendation']:
                         buy_signals.append(analysis)
@@ -406,7 +406,7 @@ def analyze_watchlist_stock(symbol):
     with st.spinner(f"Analyzing {symbol}..."):
         data = st.session_state.tt_web.fetch_data(symbol, "1y")
         if data is not None:
-            analysis = st.session_state.tt_web.analyze_minervini(data, symbol)
+            analysis = st.session_state.tt_web.analyze_tradethrust(data, symbol)
             if analysis:
                 if analysis['color'] == 'success':
                     st.success(f"{symbol}: {analysis['recommendation']} - ${analysis['price']:.2f}")
@@ -419,7 +419,7 @@ def market_scan_page():
     """Market scanning page"""
     st.header("🔍 Market Scanner")
     
-    st.info("💡 Quickly screen multiple stocks for Minervini setups")
+    st.info("💡 Quickly screen multiple stocks for TradeThrust setups")
     
     # Predefined lists
     col1, col2 = st.columns(2)
@@ -468,7 +468,7 @@ def scan_stock_list(symbols):
         try:
             data = st.session_state.tt_web.fetch_data(symbol, "1y")
             if data is not None:
-                analysis = st.session_state.tt_web.analyze_minervini(data, symbol)
+                analysis = st.session_state.tt_web.analyze_tradethrust(data, symbol)
                 if analysis:
                     results.append(analysis)
         except:
@@ -538,7 +538,7 @@ def settings_page():
     st.markdown("""
     **TradeThrust v1.0.0**
     
-    Professional stock trading system based on Mark Minervini's methodology.
+    Professional stock trading system based on TradeThrust's methodology.
     
     - ✅ Complete trend template analysis
     - ✅ VCP pattern detection  
