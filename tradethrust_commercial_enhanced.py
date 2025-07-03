@@ -62,9 +62,9 @@ class TradeThrustCommercial:
         """
         symbol = symbol.upper()
         
-        # Ask user for output preference if not specified
+        # Default to detailed if not specified
         if output_mode == "ask":
-            output_mode = self._ask_output_preference()
+            output_mode = "detailed"
         
         # Print enhanced header
         self._print_commercial_header(symbol, output_mode)
@@ -1250,25 +1250,7 @@ class TradeThrustCommercial:
         print("🏆 Professional-Grade Stock Analysis with TradeThrust Methodology")
         print("═" * 80)
     
-    def _ask_output_preference(self) -> str:
-        """Ask user for output preference"""
-        print("\n🎯 OUTPUT FORMAT SELECTION")
-        print("=" * 40)
-        print("1. 📊 DETAILED OUTPUT - Complete analysis with explanations")
-        print("2. 📋 SUMMARY OUTPUT - Quick overview with key metrics")
-        
-        while True:
-            try:
-                choice = input("\nSelect output format (1 for Detailed, 2 for Summary): ").strip()
-                if choice == '1':
-                    return "detailed"
-                elif choice == '2':
-                    return "summary"
-                else:
-                    print("❌ Please enter 1 or 2")
-            except KeyboardInterrupt:
-                print("\n📊 Using detailed output as default...")
-                return "detailed"
+
     
     def _find_last_pivot_point(self, data: pd.DataFrame) -> Dict:
         """Find the last significant breakout/pivot point"""
@@ -1564,73 +1546,71 @@ class TradeThrustCommercial:
 
 def main():
     """Main function for commercial TradeThrust"""
-    print("🚀 Welcome to TradeThrust Commercial Enhanced Edition")
+    print("🚀 Welcome to TradeThrust Commercial Enhanced Edition v4.2")
     print("Professional-Grade Stock Analysis System")
     print("=" * 60)
     
     tt = TradeThrustCommercial()
     
     while True:
-        print("\n🏆 TRADETHRUST COMMERCIAL MENU")
-        print("-" * 40)
-        print("1. 📊 Commercial Stock Analysis")
-        print("2. 📋 Quick Summary Analysis")
-        print("3. 📈 Detailed Analysis")
-        print("4. 🚪 Exit")
-        
-        choice = input("\nSelect option (1-4): ").strip()
-        
-        if choice == '1':
-            symbol = input("Enter stock symbol: ").strip().upper()
-            if symbol:
-                try:
-                    # User will be asked for output preference
-                    result = tt.analyze_stock_commercial(symbol, output_mode="ask")
+        try:
+            # Step 1: Get stock symbol
+            print("\n� TRADETHRUST ANALYSIS")
+            print("-" * 30)
+            symbol = input("Enter stock symbol (or 'exit' to quit): ").strip().upper()
+            
+            if symbol == 'EXIT':
+                print("\n🚀 Thank you for using TradeThrust Commercial Enhanced Edition!")
+                break
+            
+            if not symbol:
+                print("❌ Please enter a valid stock symbol.")
+                continue
+            
+            # Step 2: Choose output format
+            print(f"\n🎯 ANALYSIS OPTIONS FOR {symbol}")
+            print("-" * 30)
+            print("1. 📋 Summary Analysis (Quick overview)")
+            print("2. 📈 Detailed Analysis (Complete with charts)")
+            
+            while True:
+                format_choice = input("\nSelect format (1 for Summary, 2 for Detailed): ").strip()
+                if format_choice == '1':
+                    output_mode = "summary"
+                    break
+                elif format_choice == '2':
+                    output_mode = "detailed"
+                    break
+                else:
+                    print("❌ Please enter 1 or 2")
+            
+            # Step 3: Run analysis
+            print(f"\n🔄 Analyzing {symbol}...")
+            try:
+                result = tt.analyze_stock_commercial(symbol, output_mode=output_mode)
+                
+                if 'error' in result:
+                    print(f"\n❌ {result['error']}")
+                    print("💡 Please check the stock symbol and try again.")
+                else:
+                    print(f"\n✅ Analysis for {symbol} completed successfully!")
                     
-                    # Ask for another analysis
-                    another = input(f"\nAnalyze another stock? (y/n): ").strip().lower()
-                    if another != 'y':
-                        break
-                        
-                except Exception as e:
-                    print(f"❌ Error analyzing {symbol}: {e}")
+            except Exception as e:
+                print(f"\n❌ Error analyzing {symbol}: {e}")
+                print("💡 This might be due to:")
+                print("   - Invalid stock symbol")
+                print("   - Network connection issues")
+                print("   - Missing dependencies (run: pip install yfinance pandas numpy matplotlib)")
         
-        elif choice == '2':
-            symbol = input("Enter stock symbol: ").strip().upper()
-            if symbol:
-                try:
-                    # Force summary mode
-                    result = tt.analyze_stock_commercial(symbol, output_mode="summary")
-                    
-                    # Ask for another analysis
-                    another = input(f"\nAnalyze another stock? (y/n): ").strip().lower()
-                    if another != 'y':
-                        break
-                        
-                except Exception as e:
-                    print(f"❌ Error analyzing {symbol}: {e}")
-        
-        elif choice == '3':
-            symbol = input("Enter stock symbol: ").strip().upper()
-            if symbol:
-                try:
-                    # Force detailed mode
-                    result = tt.analyze_stock_commercial(symbol, output_mode="detailed")
-                    
-                    # Ask for another analysis
-                    another = input(f"\nAnalyze another stock? (y/n): ").strip().lower()
-                    if another != 'y':
-                        break
-                        
-                except Exception as e:
-                    print(f"❌ Error analyzing {symbol}: {e}")
-        
-        elif choice == '4':
-            print("\n🚀 Thank you for using TradeThrust Commercial Enhanced Edition!")
+        except KeyboardInterrupt:
+            print("\n\n🚀 Thank you for using TradeThrust Commercial Enhanced Edition!")
             break
+        except Exception as e:
+            print(f"\n❌ Unexpected error: {e}")
+            print("💡 Please try again or contact support.")
         
-        else:
-            print("❌ Invalid option. Please select 1-4.")
+        # Always return to main menu
+        print("\n" + "="*60)
 
 if __name__ == "__main__":
     main()
