@@ -393,8 +393,233 @@ class TradeThrust:
             'volume_detail': volume_details
         }
     
+    def check_pivot_point_breakout(self, data: pd.DataFrame) -> Dict:
+        """🎯 COMPREHENSIVE PIVOT POINT ANALYSIS - Professional Entry Timing"""
+        if data is None or len(data) < 75:
+            return {'valid_breakout': False, 'error': 'Insufficient data for pivot analysis'}
+        
+        print("\n🎯 PIVOT POINT ANALYSIS")
+        print("─" * 45)
+        
+        # Step 1: Identify Valid Pivot Point
+        pivot_analysis = self._identify_valid_pivot_point(data)
+        
+        if not pivot_analysis['valid']:
+            return {
+                'valid_breakout': False,
+                'reason': 'No valid pivot point identified',
+                'pivot_analysis': pivot_analysis
+            }
+        
+        # Step 2: Confirm Valid Breakout
+        breakout_analysis = self._confirm_pivot_breakout(data, pivot_analysis)
+        
+        return {
+            'valid_breakout': breakout_analysis['confirmed'],
+            'pivot_point': pivot_analysis['pivot_point'],
+            'pivot_analysis': pivot_analysis,
+            'breakout_analysis': breakout_analysis,
+            'overall_score': f"{breakout_analysis.get('score', 0)}/8"
+        }
+    
+    def _identify_valid_pivot_point(self, data: pd.DataFrame) -> Dict:
+        """🔹 Algorithm: Identify a Valid Pivot Point"""
+        # Analyze last 15 weeks (75 trading days) for base pattern
+        base_period = data.tail(75)
+        current_price = data.iloc[-1]['Close']
+        
+        # Find contractions in the base
+        contractions = self._find_pivot_contractions(base_period)
+        
+        # Validate base requirements
+        base_weeks = len(base_period) / 5
+        
+        # Check all pivot point requirements
+        requirements = {
+            'base_duration': 5 <= base_weeks <= 15,
+            'min_contractions': len(contractions) >= 2,
+            'contractions_decreasing': self._contractions_decreasing(contractions),
+            'volume_contracts': self._volume_contracts_during_pullbacks(contractions),
+            'final_tight': self._final_contraction_tight(contractions),
+            'within_5_percent': False,
+            'orderly_base': self._base_is_orderly(contractions)
+        }
+        
+        # Find pivot point (highest price before final contraction)
+        pivot_point = None
+        if contractions and requirements['min_contractions']:
+            final_contraction = contractions[-1]
+            pre_contraction_data = base_period.iloc[:final_contraction['start_idx']]
+            
+            if len(pre_contraction_data) > 0:
+                pivot_point = pre_contraction_data['High'].max()
+                requirements['within_5_percent'] = abs(current_price - pivot_point) / pivot_point <= 0.05
+        
+        all_valid = all(requirements.values())
+        
+        print(f"📊 Pivot Point Validation:")
+        print(f"   Base Duration: {base_weeks:.1f} weeks {'✅' if requirements['base_duration'] else '❌'}")
+        print(f"   Contractions: {len(contractions)} found {'✅' if requirements['min_contractions'] else '❌'}")
+        print(f"   Decreasing Size: {'✅' if requirements['contractions_decreasing'] else '❌'}")
+        print(f"   Volume Contracts: {'✅' if requirements['volume_contracts'] else '❌'}")
+        print(f"   Final Tight: {'✅' if requirements['final_tight'] else '❌'}")
+        print(f"   Within 5%: {'✅' if requirements['within_5_percent'] else '❌'}")
+        print(f"   Orderly Base: {'✅' if requirements['orderly_base'] else '❌'}")
+        
+        if all_valid and pivot_point:
+            print(f"✅ Valid pivot point at ${pivot_point:.2f}")
+        else:
+            print("❌ No valid pivot point - wait for proper base")
+        
+        return {
+            'valid': all_valid,
+            'pivot_point': pivot_point,
+            'contractions': contractions,
+            'base_weeks': base_weeks,
+            'requirements': requirements
+        }
+    
+    def _confirm_pivot_breakout(self, data: pd.DataFrame, pivot_analysis: Dict) -> Dict:
+        """🔹 Algorithm: Confirm a Valid Breakout"""
+        print("\n🔹 BREAKOUT CONFIRMATION:")
+        
+        latest = data.iloc[-1]
+        recent_50 = data.tail(50)
+        recent_10 = data.tail(10)
+        
+        current_price = latest['Close']
+        daily_high = latest['High']
+        daily_low = latest['Low']
+        current_volume = latest['Volume']
+        pivot_point = pivot_analysis['pivot_point']
+        avg_volume_50 = recent_50['Volume'].mean()
+        
+        # Breakout validation criteria
+        criteria = {
+            # Price Confirmation
+            'breaks_pivot': current_price > pivot_point,
+            'closes_near_high': (current_price / daily_high) >= 0.95,
+            'no_intraday_failure': daily_low >= pivot_point * 0.98,
+            
+            # Volume Confirmation  
+            'volume_surge': current_volume >= avg_volume_50 * 1.5,
+            'volume_increasing': current_volume > recent_10['Volume'].tail(5).mean() * 1.2,
+            
+            # Structure Confirmation
+            'tight_prior_action': self._prior_action_tight(recent_10, data.tail(50)),
+            'no_wide_down_days': self._no_wide_down_days(data.tail(5), data.tail(50))
+        }
+        
+        # Display results
+        score = sum(criteria.values())
+        breakout_confirmed = score >= 6  # Need 6 out of 7 criteria
+        
+        print(f"   Price above pivot: {'✅' if criteria['breaks_pivot'] else '❌'}")
+        print(f"   Closes near high: {'✅' if criteria['closes_near_high'] else '❌'}")
+        print(f"   No intraday failure: {'✅' if criteria['no_intraday_failure'] else '❌'}")
+        print(f"   Volume surge: {'✅' if criteria['volume_surge'] else '❌'}")
+        print(f"   Volume increasing: {'✅' if criteria['volume_increasing'] else '❌'}")
+        print(f"   Tight prior action: {'✅' if criteria['tight_prior_action'] else '❌'}")
+        print(f"   No wide down days: {'✅' if criteria['no_wide_down_days'] else '❌'}")
+        
+        if breakout_confirmed:
+            print(f"✅ Breakout CONFIRMED - Score: {score}/7")
+        else:
+            print(f"❌ Breakout NOT confirmed - Score: {score}/7")
+        
+        return {
+            'confirmed': breakout_confirmed,
+            'score': score,
+            'criteria': criteria,
+            'volume_ratio': current_volume / avg_volume_50
+        }
+    
+    def _find_pivot_contractions(self, data: pd.DataFrame) -> List[Dict]:
+        """Find price contractions for pivot analysis"""
+        contractions = []
+        if len(data) < 10:
+            return contractions
+        
+        # Find swing highs and lows  
+        highs = []
+        lows = []
+        window = min(3, len(data) // 6)
+        
+        for i in range(window, len(data) - window):
+            # Swing high
+            if all(data.iloc[i]['High'] >= data.iloc[j]['High'] for j in range(i-window, i+window+1) if j != i):
+                highs.append({'index': i, 'price': data.iloc[i]['High']})
+            
+            # Swing low
+            if all(data.iloc[i]['Low'] <= data.iloc[j]['Low'] for j in range(i-window, i+window+1) if j != i):
+                lows.append({'index': i, 'price': data.iloc[i]['Low']})
+        
+        # Match highs with subsequent lows
+        for high in highs:
+            subsequent_lows = [low for low in lows if low['index'] > high['index']]
+            if subsequent_lows:
+                lowest_low = min(subsequent_lows, key=lambda x: x['price'])
+                decline_pct = ((high['price'] - lowest_low['price']) / high['price']) * 100
+                
+                # Calculate volume during contraction
+                contraction_data = data.iloc[high['index']:lowest_low['index']+1]
+                if len(contraction_data) > 0:
+                    avg_volume = contraction_data['Volume'].mean()
+                    base_volume = data['Volume'].mean()
+                    volume_ratio = avg_volume / base_volume if base_volume > 0 else 1
+                    
+                    contractions.append({
+                        'start_idx': high['index'],
+                        'end_idx': lowest_low['index'],
+                        'decline_pct': decline_pct,
+                        'volume_ratio': volume_ratio
+                    })
+        
+        # Return meaningful contractions (at least 3% decline)
+        return [c for c in contractions if c['decline_pct'] >= 3]
+    
+    def _contractions_decreasing(self, contractions: List[Dict]) -> bool:
+        """Check if contractions are getting progressively smaller"""
+        if len(contractions) < 2:
+            return False
+        for i in range(1, len(contractions)):
+            if contractions[i]['decline_pct'] >= contractions[i-1]['decline_pct']:
+                return False
+        return True
+    
+    def _volume_contracts_during_pullbacks(self, contractions: List[Dict]) -> bool:
+        """Check if volume contracts during pullbacks"""
+        return all(c['volume_ratio'] < 0.8 for c in contractions)
+    
+    def _final_contraction_tight(self, contractions: List[Dict]) -> bool:
+        """Check if final contraction is tight (< 15%)"""
+        return len(contractions) > 0 and contractions[-1]['decline_pct'] < 15
+    
+    def _base_is_orderly(self, contractions: List[Dict]) -> bool:
+        """Check if base is orderly (no pullbacks > 25%)"""
+        return all(c['decline_pct'] <= 25 for c in contractions)
+    
+    def _prior_action_tight(self, recent_data: pd.DataFrame, longer_data: pd.DataFrame) -> bool:
+        """Check if prior 5-10 days show tight action"""
+        recent_ranges = recent_data['High'] - recent_data['Low']
+        longer_ranges = longer_data['High'] - longer_data['Low']
+        return recent_ranges.mean() < longer_ranges.mean() * 0.8
+    
+    def _no_wide_down_days(self, recent_days: pd.DataFrame, reference_data: pd.DataFrame) -> bool:
+        """Check for no wide-range down days before breakout"""
+        avg_range = (reference_data['High'] - reference_data['Low']).mean()
+        
+        for _, day in recent_days.iterrows():
+            daily_range = day['High'] - day['Low']
+            is_down_day = day['Close'] < day['Open']
+            is_wide_range = daily_range > avg_range * 1.5
+            
+            if is_down_day and is_wide_range:
+                return False
+        return True
+    
     def check_breakout_entry_signal(self, data: pd.DataFrame) -> Dict:
-        """Check for TradeThrust-style breakout entry signals"""
+        """Legacy breakout check (kept for compatibility)"""
         if data is None or len(data) < 50:
             return {'breakout_signal': False, 'error': 'Insufficient data'}
         
@@ -518,24 +743,26 @@ class TradeThrust:
             vcp_detected = False
             print("❌ VCP Analysis Failed - Insufficient Data")
         
-        # Phase 3: Entry Signal Analysis
-        print("\n🎯 PHASE 3: ENTRY SIGNAL CHECK")
-        print("-" * 35)
+        # Phase 3: Pivot Point Analysis & Entry Signal
+        print("\n🎯 PHASE 3: PIVOT POINT & ENTRY ANALYSIS")
+        print("-" * 45)
         
-        breakout_results = self.check_breakout_entry_signal(data)
-        if 'error' not in breakout_results:
-            entry_signal = breakout_results['breakout_signal']
-            status = "✅ BUY SIGNAL" if entry_signal else "❌ NO SIGNAL"
-            print(f"{status} Breakout Entry")
+        pivot_results = self.check_pivot_point_breakout(data)
+        if 'error' not in pivot_results:
+            entry_signal = pivot_results['valid_breakout']
             
-            details = breakout_results['details']
-            print(f"    Current Price: ${details['current_price']:.2f}")
-            print(f"    Resistance Level: ${details['resistance_level']:.2f}")
-            print(f"    Volume Surge: {details['volume_surge_pct']:.1f}% above average")
-            print(f"    Distance from Resistance: {details['distance_from_resistance_pct']:.2f}%")
+            if entry_signal:
+                print("✅ VALID BREAKOUT CONFIRMED")
+                print(f"    Pivot Point: ${pivot_results['pivot_point']:.2f}")
+                print(f"    Breakout Score: {pivot_results['overall_score']}")
+                print(f"    Volume Ratio: {pivot_results['breakout_analysis']['volume_ratio']:.1f}x")
+            else:
+                print("❌ NO VALID BREAKOUT")
+                if 'reason' in pivot_results:
+                    print(f"    Reason: {pivot_results['reason']}")
         else:
             entry_signal = False
-            print("❌ Entry Signal Analysis Failed")
+            print("❌ Pivot Point Analysis Failed")
         
         # Risk Management Calculations
         print("\n💰 RISK MANAGEMENT")
@@ -607,12 +834,12 @@ class TradeThrust:
             'current_price': latest_price,
             'stop_loss': recommended_stop,
             'risk_percent': risk_percent,
-            'resistance_level': breakout_results.get('details', {}).get('resistance_level', 0),
+            'resistance_level': pivot_results.get('pivot_point', 0),
             'support_level': recent_support,
             'analysis_details': {
                 'trend_template': trend_results,
                 'vcp_analysis': vcp_results,
-                'breakout_analysis': breakout_results
+                'pivot_analysis': pivot_results
             }
         }
     
