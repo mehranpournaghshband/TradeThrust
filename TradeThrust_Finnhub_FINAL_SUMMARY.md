@@ -174,6 +174,9 @@ pip install -r requirements.txt
 # Get free Finnhub API key
 # Visit: https://finnhub.io
 
+# Set environment variable (RECOMMENDED)
+export FINNHUB_API_KEY="your_api_key_here"
+
 # Run the algorithm
 python3 tradethrust_finnhub.py
 
@@ -181,7 +184,32 @@ python3 tradethrust_finnhub.py
 python3 tradethrust_finnhub_demo.py
 ```
 
-### **Interactive Mode**
+### **Environment Variable Setup (NEW!)**
+**Linux/Mac:**
+```bash
+export FINNHUB_API_KEY="your_api_key_here"
+```
+
+**Windows (Command Prompt):**
+```cmd
+set FINNHUB_API_KEY=your_api_key_here
+```
+
+**Windows (PowerShell):**
+```powershell
+$env:FINNHUB_API_KEY="your_api_key_here"
+```
+
+### **Interactive Mode (With Environment Variable)**
+```bash
+export FINNHUB_API_KEY="your_api_key_here"
+python3 tradethrust_finnhub.py
+🔑 Using FINNHUB_API_KEY from environment variable
+✅ API key loaded successfully
+Enter stock symbol: AAPL
+```
+
+### **Interactive Mode (Without Environment Variable)**
 ```bash
 python3 tradethrust_finnhub.py
 Enter your Finnhub API key (or press Enter for demo): 
@@ -272,6 +300,8 @@ requests>=2.28.0 # HTTP requests to Finnhub API
 ✅ **Enhanced risk management with exact calculations**  
 ✅ **Professional error handling - never crashes**  
 ✅ **Always provides actionable buy/sell prices**  
+✅ **Environment variable support (FINNHUB_API_KEY)**  
+✅ **No more prompting when API key is set**  
 ✅ **Commercial-grade code quality**  
 ✅ **Comprehensive documentation**  
 ✅ **Ready for production deployment**  
