@@ -40,7 +40,6 @@ class TradeThrustFinnhub:
         self.base_url = "https://finnhub.io/api/v1"
         self.session = requests.Session()
         self.session.headers.update({
-            'X-Finnhub-Token': self.finnhub_api_key,
             'User-Agent': 'TradeThrust/1.0'
         })
         
@@ -64,7 +63,8 @@ class TradeThrustFinnhub:
                 'symbol': symbol,
                 'resolution': 'D',  # Daily data
                 'from': start_time,
-                'to': end_time
+                'to': end_time,
+                'token': self.finnhub_api_key  # API key as query parameter
             }
             
             print(f"   📡 Requesting data from Finnhub API...")
@@ -434,7 +434,11 @@ class TradeThrustFinnhub:
         try:
             # Try to get basic company metrics from Finnhub
             url = f"{self.base_url}/stock/metric"
-            params = {'symbol': symbol, 'metric': 'all'}
+            params = {
+                'symbol': symbol, 
+                'metric': 'all',
+                'token': self.finnhub_api_key  # API key as query parameter
+            }
             
             response = self.session.get(url, params=params, timeout=15)
             
