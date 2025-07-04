@@ -16,6 +16,7 @@ Version: FINNHUB FINAL
 import pandas as pd
 import numpy as np
 import requests
+import os
 from datetime import datetime, timedelta
 from typing import Dict, Optional, List
 import warnings
@@ -24,13 +25,17 @@ warnings.filterwarnings('ignore')
 class TradeThrustFinnhub:
     """TradeThrust implementation using Finnhub API"""
     
-    def __init__(self, api_key: str = "demo"):
+    def __init__(self, api_key: Optional[str] = None):
         """
         Initialize TradeThrust with Finnhub API
         
         Args:
             api_key: Finnhub API key (get free at https://finnhub.io)
+                    If None, will check FINNHUB_API_KEY environment variable
         """
+        if api_key is None:
+            api_key = os.getenv('FINNHUB_API_KEY', 'demo')
+        
         self.finnhub_api_key = api_key
         self.base_url = "https://finnhub.io/api/v1"
         self.session = requests.Session()
@@ -823,17 +828,24 @@ class TradeThrustFinnhub:
         return avg_range < 0.03  # Less than 3% average range
 
 def main():
-    """Main execution with API key input"""
+    """Main execution with API key from environment or input"""
     print("🚀 TradeThrust Finnhub Algorithm")
     print("✅ Using Finnhub.io for reliable stock data")
     print("📊 Get your free API key at: https://finnhub.io")
     print("=" * 60)
     
-    # Get API key from user
-    api_key = input("Enter your Finnhub API key (or press Enter for demo): ").strip()
-    if not api_key:
-        api_key = "demo"
-        print("🔧 Using demo API key (limited functionality)")
+    # Check for API key in environment variable first
+    api_key = os.getenv('FINNHUB_API_KEY')
+    
+    if api_key:
+        print("🔑 Using FINNHUB_API_KEY from environment variable")
+        print("✅ API key loaded successfully")
+    else:
+        # Get API key from user if not in environment
+        api_key = input("Enter your Finnhub API key (or press Enter for demo): ").strip()
+        if not api_key:
+            api_key = "demo"
+            print("🔧 Using demo API key (limited functionality)")
     
     tt = TradeThrustFinnhub(api_key=api_key)
     

@@ -9,6 +9,7 @@ confidence scoring and exact algorithm implementation.
 Author: TradeThrust Team
 """
 
+import os
 from tradethrust_finnhub import TradeThrustFinnhub
 
 def run_finnhub_demo():
@@ -25,11 +26,19 @@ def run_finnhub_demo():
     # Test symbols - mix of different market conditions
     test_symbols = ['AAPL', 'MSFT', 'NVDA', 'GOOGL', 'META']
     
-    # Initialize with demo API key
-    print("🔧 Initializing with demo API key...")
-    print("💡 For full functionality, get free API key at https://finnhub.io")
+    # Check for API key in environment variable first
+    api_key = os.getenv('FINNHUB_API_KEY')
     
-    tt = TradeThrustFinnhub(api_key="demo")
+    if api_key:
+        print("� Using FINNHUB_API_KEY from environment variable")
+        print("✅ API key loaded successfully for enhanced functionality")
+    else:
+        api_key = "demo"
+        print("🔧 Using demo API key (limited functionality)")
+        print("💡 For full functionality, set FINNHUB_API_KEY environment variable")
+        print("💡 Or get free API key at https://finnhub.io")
+    
+    tt = TradeThrustFinnhub(api_key=api_key)
     
     print(f"\n🧪 Testing {len(test_symbols)} symbols with Finnhub data...")
     

@@ -32,6 +32,9 @@ pip install -r requirements.txt
 # Get free Finnhub API key (optional but recommended)
 # Visit: https://finnhub.io
 
+# Set your API key as environment variable (recommended)
+export FINNHUB_API_KEY="your_finnhub_api_key_here"
+
 # Run the algorithm
 python3 tradethrust_finnhub.py
 
@@ -81,6 +84,22 @@ python3 tradethrust_finnhub_demo.py
 - Perfect for testing and learning
 - Upgrade to free API key for full features
 
+### **Environment Variable Setup:**
+**Linux/Mac:**
+```bash
+export FINNHUB_API_KEY="your_api_key_here"
+```
+
+**Windows (Command Prompt):**
+```cmd
+set FINNHUB_API_KEY=your_api_key_here
+```
+
+**Windows (PowerShell):**
+```powershell
+$env:FINNHUB_API_KEY="your_api_key_here"
+```
+
 ## 🎯 Why Finnhub?
 
 ✅ **Professional Grade** - Used by major financial institutions  
@@ -102,18 +121,31 @@ Overall Confidence = Weighted Average:
 
 ## 📞 Usage
 
-### **Interactive Mode:**
+### **Interactive Mode (with environment variable):**
+```bash
+export FINNHUB_API_KEY="your_api_key_here"
+python3 tradethrust_finnhub.py
+# No prompt - uses environment variable automatically
+Enter stock symbol: AAPL
+```
+
+### **Interactive Mode (without environment variable):**
 ```bash
 python3 tradethrust_finnhub.py
-Enter your Finnhub API key (or press Enter for demo): 
+Enter your Finnhub API key (or press Enter for demo): your_api_key_here
 Enter stock symbol: AAPL
 ```
 
 ### **Programmatic Use:**
 ```python
+import os
 from tradethrust_finnhub import TradeThrustFinnhub
 
-# Initialize with your API key
+# Method 1: Use environment variable (recommended)
+os.environ['FINNHUB_API_KEY'] = "your_api_key_here"
+tt = TradeThrustFinnhub()  # Automatically uses environment variable
+
+# Method 2: Pass API key directly
 tt = TradeThrustFinnhub(api_key="your_finnhub_api_key")
 
 # Analyze any stock
