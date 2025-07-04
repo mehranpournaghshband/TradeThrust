@@ -100,6 +100,15 @@ set FINNHUB_API_KEY=your_api_key_here
 $env:FINNHUB_API_KEY="your_api_key_here"
 ```
 
+**Windows (System Variables - Permanent):**
+1. Windows Key + R → type `sysdm.cpl` → Enter
+2. Environment Variables button  
+3. New under User variables
+4. Variable name: `FINNHUB_API_KEY`
+5. Variable value: `your_actual_key_here`
+6. OK → OK → OK
+7. Restart terminal/IDE
+
 ## 🎯 Why Finnhub?
 
 ✅ **Professional Grade** - Used by major financial institutions  
