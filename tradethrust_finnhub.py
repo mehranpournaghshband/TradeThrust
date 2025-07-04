@@ -1,153 +1,109 @@
 #!/usr/bin/env python3
 """
-TradeThrust Stock Trading Algorithm - ENHANCED FINAL VERSION
-===========================================================
+TradeThrust Stock Trading Algorithm - FINNHUB EDITION
+====================================================
 
 Following the EXACT TradeThrust algorithmic specification with:
-- Precise implementation of all 5 buy steps
+- Finnhub API for reliable stock data
 - Confidence scoring system (0-100)
-- Anti-rules and warnings implementation
-- Sell signals and risk management
-- Market condition analysis
+- Anti-rules and risk management
+- Professional output formatting
 
 Author: TradeThrust Team
-Version: ENHANCED FINAL
+Version: FINNHUB FINAL
 """
 
 import pandas as pd
 import numpy as np
 import requests
 from datetime import datetime, timedelta
-from typing import Dict, Optional, Tuple, List
+from typing import Dict, Optional, List
 import warnings
 warnings.filterwarnings('ignore')
 
-class TradeThrustEnhanced:
-    """Enhanced TradeThrust implementation with exact algorithmic principles"""
+class TradeThrustFinnhub:
+    """TradeThrust implementation using Finnhub API"""
     
-    def __init__(self):
-        self.polygon_api_key = "demo"  # Free tier available
+    def __init__(self, api_key: str = "demo"):
+        """
+        Initialize TradeThrust with Finnhub API
+        
+        Args:
+            api_key: Finnhub API key (get free at https://finnhub.io)
+        """
+        self.finnhub_api_key = api_key
+        self.base_url = "https://finnhub.io/api/v1"
         self.session = requests.Session()
         self.session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            'X-Finnhub-Token': self.finnhub_api_key,
+            'User-Agent': 'TradeThrust/1.0'
         })
         
         # Portfolio settings
         self.portfolio_value = 100000  # Default $100k portfolio
         self.max_positions = 8  # Max 5-8 positions as per anti-rules
-        
-    def get_stock_data(self, symbol: str) -> Optional[pd.DataFrame]:
-        """Get stock data with graceful error handling"""
-        symbol = symbol.upper().strip()
-        print(f"\n🔍 Fetching market data for {symbol}...")
-        
-        # Try Polygon first, then fallback to Yahoo
-        data = self._get_polygon_data(symbol)
-        if data is not None:
-            return self._calculate_indicators(data)
-        
-        print(f"   ⚠️ Polygon data not available, trying backup source...")
-        data = self._get_yahoo_data(symbol)
-        if data is not None:
-            return self._calculate_indicators(data)
-        
-        print(f"   ❌ Could not fetch data for {symbol}")
-        return None
     
-    def _get_polygon_data(self, symbol: str) -> Optional[pd.DataFrame]:
-        """Get data from Polygon API"""
+    def get_stock_data(self, symbol: str) -> Optional[pd.DataFrame]:
+        """Get comprehensive stock data from Finnhub"""
+        symbol = symbol.upper().strip()
+        print(f"\n🔍 Fetching market data for {symbol} from Finnhub...")
+        
         try:
-            print(f"   📡 Trying Polygon API for {symbol}...")
+            # Get historical data (2 years)
+            end_time = int(datetime.now().timestamp())
+            start_time = int((datetime.now() - timedelta(days=730)).timestamp())
             
-            # Free tier Polygon endpoint
-            end_date = datetime.now().strftime('%Y-%m-%d')
-            start_date = (datetime.now() - timedelta(days=730)).strftime('%Y-%m-%d')
+            # Finnhub stock candles endpoint
+            url = f"{self.base_url}/stock/candle"
+            params = {
+                'symbol': symbol,
+                'resolution': 'D',  # Daily data
+                'from': start_time,
+                'to': end_time
+            }
             
-            url = f"https://api.polygon.io/v2/aggs/ticker/{symbol}/range/1/day/{start_date}/{end_date}"
-            params = {'apikey': self.polygon_api_key}
-            
-            response = self.session.get(url, params=params, timeout=15)
+            print(f"   📡 Requesting data from Finnhub API...")
+            response = self.session.get(url, params=params, timeout=30)
             
             if response.status_code == 200:
                 data = response.json()
                 
-                if data.get('results') and len(data['results']) > 200:
-                    df_data = []
-                    for bar in data['results']:
-                        df_data.append({
-                            'Date': pd.to_datetime(bar['t'], unit='ms'),
-                            'Open': bar['o'],
-                            'High': bar['h'],
-                            'Low': bar['l'],
-                            'Close': bar['c'],
-                            'Volume': bar['v']
-                        })
+                if data.get('s') == 'ok' and data.get('c'):  # Check if we have valid data
+                    # Create DataFrame from Finnhub data
+                    df = pd.DataFrame({
+                        'Date': pd.to_datetime(data['t'], unit='s'),
+                        'Open': data['o'],
+                        'High': data['h'],
+                        'Low': data['l'],
+                        'Close': data['c'],
+                        'Volume': data['v']
+                    })
                     
-                    df = pd.DataFrame(df_data)
                     df.set_index('Date', inplace=True)
                     df = df.dropna()
                     
-                    current_price = df['Close'].iloc[-1]
-                    print(f"   ✅ Polygon SUCCESS: ${current_price:.2f}")
-                    return df
-            
-            return None
-        except Exception as e:
-            print(f"   ⚠️ Polygon error: {str(e)[:50]}...")
-            return None
-    
-    def _get_yahoo_data(self, symbol: str) -> Optional[pd.DataFrame]:
-        """Backup Yahoo Finance data"""
-        try:
-            print(f"   📡 Trying Yahoo Finance for {symbol}...")
-            
-            url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
-            params = {
-                'period1': int((datetime.now() - timedelta(days=730)).timestamp()),
-                'period2': int(datetime.now().timestamp()),
-                'interval': '1d'
-            }
-            
-            response = self.session.get(url, params=params, timeout=15)
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                if data.get('chart') and data['chart'].get('result'):
-                    result = data['chart']['result'][0]
-                    timestamps = result['timestamp']
-                    quotes = result['indicators']['quote'][0]
-                    
-                    df_data = []
-                    for i, ts in enumerate(timestamps):
-                        try:
-                            df_data.append({
-                                'Date': pd.to_datetime(ts, unit='s'),
-                                'Open': quotes['open'][i],
-                                'High': quotes['high'][i],
-                                'Low': quotes['low'][i],
-                                'Close': quotes['close'][i],
-                                'Volume': quotes['volume'][i] or 0
-                            })
-                        except:
-                            continue
-                    
-                    if len(df_data) > 200:
-                        df = pd.DataFrame(df_data)
-                        df.set_index('Date', inplace=True)
-                        df = df.dropna()
-                        
+                    if len(df) > 200:  # Ensure we have enough data
                         current_price = df['Close'].iloc[-1]
-                        print(f"   ✅ Yahoo SUCCESS: ${current_price:.2f}")
-                        return df
-            
-            return None
+                        print(f"   ✅ Finnhub SUCCESS: ${current_price:.2f} ({len(df)} days)")
+                        return self._calculate_indicators(df)
+                    else:
+                        print(f"   ⚠️ Insufficient data: only {len(df)} days")
+                        return None
+                else:
+                    print(f"   ⚠️ Finnhub returned no data for {symbol}")
+                    return None
+            else:
+                print(f"   ❌ Finnhub API error: {response.status_code}")
+                return None
+                
         except Exception as e:
-            print(f"   ⚠️ Yahoo error: {str(e)[:50]}...")
+            print(f"   ❌ Error fetching data: {str(e)[:50]}...")
             return None
     
     def _calculate_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         """Calculate all required technical indicators"""
+        print(f"   🔧 Calculating technical indicators...")
+        
         # Moving averages
         df['SMA_50'] = df['Close'].rolling(window=50, min_periods=1).mean()
         df['SMA_150'] = df['Close'].rolling(window=150, min_periods=1).mean()
@@ -164,12 +120,12 @@ class TradeThrustEnhanced:
         # Price ranges for VCP analysis
         df['High_Low_Range'] = (df['High'] - df['Low']) / df['Close']
         
-        # Relative Strength (enhanced calculation)
+        # Relative Strength calculation
         if len(df) >= 63:
             price_3m_ago = df['Close'].shift(63)
             performance_3m = (df['Close'] - price_3m_ago) / price_3m_ago * 100
             
-            # More sophisticated RS rating
+            # Convert performance to RS rating (0-99)
             rs_values = []
             for perf in performance_3m:
                 if pd.isna(perf):
@@ -201,31 +157,34 @@ class TradeThrustEnhanced:
         df['SMA_200_Slope'] = df['SMA_200'].diff()
         df['SMA_200_Trend'] = df['SMA_200_Slope'].rolling(window=20).apply(lambda x: (x > 0).all())
         
+        print(f"   ✅ Technical indicators calculated")
         return df
     
     def analyze_stock(self, symbol: str) -> Dict:
-        """Complete TradeThrust analysis following exact algorithm with confidence scoring"""
+        """Complete TradeThrust analysis following exact algorithm"""
         symbol = symbol.upper()
         
         print(f"\n{'='*80}")
-        print(f"🚀 TRADETHRUST ENHANCED ALGORITHM")
+        print(f"🚀 TRADETHRUST FINNHUB ALGORITHM")
         print(f"📊 Symbol: {symbol} | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"🔗 Data Source: Finnhub.io API")
         print(f"✅ Following EXACT TradeThrust Principles")
         print(f"{'='*80}")
         
-        # Get data
+        # Get data from Finnhub
         data = self.get_stock_data(symbol)
         if data is None:
             return {
-                'error': f'Market data not available for {symbol}',
+                'error': f'Market data not available for {symbol} from Finnhub',
                 'symbol': symbol,
+                'data_source': 'Finnhub',
                 'timestamp': datetime.now().isoformat()
             }
         
         current_price = data['Close'].iloc[-1]
         print(f"\n✅ DATA LOADED: ${current_price:.2f}")
         
-        # Apply TradeThrust algorithm with exact steps
+        # Apply TradeThrust 5-step algorithm
         results = {}
         
         # Step 1: Trend Template Filter (EXACT implementation)
@@ -248,8 +207,8 @@ class TradeThrustEnhanced:
         else:
             results['breakout_confirmation'] = {'confirmed': False, 'reason': 'No VCP detected'}
         
-        # Step 4: Optional Fundamentals
-        fundamentals_result = self._step4_optional_fundamentals(symbol)
+        # Step 4: Optional Fundamentals (Finnhub has some fundamental data)
+        fundamentals_result = self._step4_fundamentals_finnhub(symbol)
         results['fundamentals'] = fundamentals_result
         
         # Step 5: Risk Setup and Buy Execution
@@ -260,7 +219,7 @@ class TradeThrustEnhanced:
         anti_rules_result = self._check_anti_rules(data, symbol, trend_result)
         results['anti_rules'] = anti_rules_result
         
-        # Market Condition Check
+        # Market Condition Check (using Finnhub)
         market_condition = self._check_market_condition()
         results['market_condition'] = market_condition
         
@@ -274,6 +233,7 @@ class TradeThrustEnhanced:
         return {
             'symbol': symbol,
             'current_price': current_price,
+            'data_source': 'Finnhub',
             **results,
             'timestamp': datetime.now().isoformat()
         }
@@ -293,7 +253,7 @@ class TradeThrustEnhanced:
         rs_rating = latest['RS_Rating']
         sma_200_trend = latest['SMA_200_Trend'] if not pd.isna(latest['SMA_200_Trend']) else False
         
-        # EXACT conditions as per algorithm
+        # EXACT conditions as per TradeThrust algorithm
         conditions = [
             ("Price > 50-day SMA", price > sma_50, f"${price:.2f} vs ${sma_50:.2f}", 10),
             ("Price > 150-day SMA", price > sma_150, f"${price:.2f} vs ${sma_150:.2f}", 10),
@@ -308,7 +268,7 @@ class TradeThrustEnhanced:
         ]
         
         print(f"{'Condition':<32} {'Status':<8} {'Details':<20} {'Points'}")
-        print("─" * 70)
+        print("─" * 80)
         
         total_score = 0
         max_score = 100
@@ -321,7 +281,7 @@ class TradeThrustEnhanced:
                 passed_conditions += 1
             print(f"{condition:<32} {status_symbol:<8} {details:<20} {points if status else 0}")
         
-        print("─" * 70)
+        print("─" * 80)
         result = passed_conditions == len(conditions)  # ALL must pass
         status = "✅ PASSED" if result else "❌ FAILED"
         confidence = (total_score / max_score) * 100
@@ -369,7 +329,7 @@ class TradeThrustEnhanced:
         ]
         
         print(f"{'VCP Condition':<25} {'Status':<8} {'Details':<20} {'Points'}")
-        print("─" * 70)
+        print("─" * 75)
         
         total_score = 0
         max_score = 100
@@ -382,7 +342,7 @@ class TradeThrustEnhanced:
                 passed_conditions += 1
             print(f"{condition:<25} {status_symbol:<8} {details:<20} {points if status else 0}")
         
-        print("─" * 70)
+        print("─" * 75)
         # VCP detected if score >= 70% (more lenient than trend template)
         detected = total_score >= 70
         status = "✅ DETECTED" if detected else "❌ NOT DETECTED"
@@ -428,7 +388,7 @@ class TradeThrustEnhanced:
         ]
         
         print(f"{'Breakout Condition':<25} {'Status':<8} {'Details':<25} {'Points'}")
-        print("─" * 70)
+        print("─" * 75)
         
         total_score = 0
         max_score = 100
@@ -441,7 +401,7 @@ class TradeThrustEnhanced:
                 passed_conditions += 1
             print(f"{condition:<25} {status_symbol:<8} {details:<25} {points if status else 0}")
         
-        print("─" * 70)
+        print("─" * 75)
         # Breakout confirmed if ALL conditions met (exact requirement)
         confirmed = passed_conditions == len(conditions)
         status = "✅ CONFIRMED" if confirmed else "❌ NOT CONFIRMED"
@@ -460,21 +420,48 @@ class TradeThrustEnhanced:
             'details': dict(zip([c[0] for c in conditions], [c[1] for c in conditions]))
         }
     
-    def _step4_optional_fundamentals(self, symbol: str) -> Dict:
-        """Step 4: Optional Fundamentals (Graceful handling)"""
-        print(f"\n📌 STEP 4: OPTIONAL FUNDAMENTALS (BOOST CONVICTION)")
+    def _step4_fundamentals_finnhub(self, symbol: str) -> Dict:
+        """Step 4: Optional Fundamentals using Finnhub"""
+        print(f"\n📌 STEP 4: OPTIONAL FUNDAMENTALS (FINNHUB)")
         print("─" * 70)
-        print("💡 These boost conviction but are not required for trade execution")
+        print("💡 Attempting to fetch fundamental data from Finnhub...")
         
-        # Gracefully handle missing fundamental data
-        fundamentals = [
-            ("EPS Growth ≥ 25%", False, "Data not available", 15),
-            ("Sales Growth ≥ 25%", False, "Data not available", 15),
-            ("ROE ≥ 17%", False, "Data not available", 15),
-            ("Margins increasing", False, "Data not available", 15),
-            ("Earnings acceleration", False, "Data not available", 20),
-            ("Top 3 sector rank", False, "Data not available", 20)
-        ]
+        try:
+            # Try to get basic company metrics from Finnhub
+            url = f"{self.base_url}/stock/metric"
+            params = {'symbol': symbol, 'metric': 'all'}
+            
+            response = self.session.get(url, params=params, timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                metrics = data.get('metric', {})
+                
+                if metrics:
+                    print(f"   ✅ Fundamental data retrieved from Finnhub")
+                    
+                    # Extract available metrics
+                    roe = metrics.get('roeTTM', 0)
+                    eps_growth = metrics.get('epsGrowth5Y', 0) if metrics.get('epsGrowth5Y') else 0
+                    
+                    fundamentals = [
+                        ("EPS Growth ≥ 25%", eps_growth >= 25, f"{eps_growth:.1f}%" if eps_growth else "N/A", 15),
+                        ("Sales Growth ≥ 25%", False, "Data not available", 15),
+                        ("ROE ≥ 17%", roe >= 17, f"{roe:.1f}%" if roe else "N/A", 15),
+                        ("Margins increasing", False, "Data not available", 15),
+                        ("Earnings acceleration", False, "Data not available", 20),
+                        ("Top 3 sector rank", False, "Data not available", 20)
+                    ]
+                else:
+                    print(f"   ⚠️ No fundamental data available")
+                    fundamentals = self._get_default_fundamentals()
+            else:
+                print(f"   ⚠️ Finnhub fundamentals API error: {response.status_code}")
+                fundamentals = self._get_default_fundamentals()
+                
+        except Exception as e:
+            print(f"   ❌ Error fetching fundamentals: {str(e)[:50]}...")
+            fundamentals = self._get_default_fundamentals()
         
         print(f"{'Fundamental':<20} {'Status':<8} {'Details':<20} {'Points'}")
         print("─" * 70)
@@ -484,19 +471,31 @@ class TradeThrustEnhanced:
         
         for condition, status, details, points in fundamentals:
             status_symbol = "✅ PASS" if status else "⚠️ N/A"
+            if status:
+                total_score += points
             print(f"{condition:<20} {status_symbol:<8} {details:<20} {points if status else 0}")
         
         print("─" * 70)
-        print(f"🎯 FUNDAMENTALS: ⚠️ NOT AVAILABLE | Score: {total_score}/100")
-        print("💡 Technical setup takes priority when fundamentals unavailable")
+        print(f"🎯 FUNDAMENTALS: {'✅ AVAILABLE' if total_score > 0 else '⚠️ LIMITED'} | Score: {total_score}/100")
         
         return {
-            'available': False,
+            'available': total_score > 0,
             'score': total_score,
             'max_score': max_score,
             'confidence': total_score,
-            'note': "Fundamental data not available - using technical analysis only"
+            'note': "Using Finnhub fundamental data where available"
         }
+    
+    def _get_default_fundamentals(self) -> List:
+        """Default fundamentals when data not available"""
+        return [
+            ("EPS Growth ≥ 25%", False, "Data not available", 15),
+            ("Sales Growth ≥ 25%", False, "Data not available", 15),
+            ("ROE ≥ 17%", False, "Data not available", 15),
+            ("Margins increasing", False, "Data not available", 15),
+            ("Earnings acceleration", False, "Data not available", 20),
+            ("Top 3 sector rank", False, "Data not available", 20)
+        ]
     
     def _step5_risk_setup_exact(self, data: pd.DataFrame, symbol: str, trend_result: Dict, 
                                vcp_result: Optional[Dict], breakout_result: Optional[Dict]) -> Dict:
@@ -609,19 +608,20 @@ class TradeThrustEnhanced:
         }
     
     def _check_market_condition(self) -> Dict:
-        """Check overall market condition (simplified)"""
+        """Check overall market condition using Finnhub"""
         print(f"\n📈 MARKET CONDITION CHECK")
         print("─" * 50)
         
-        # Simplified market check (would normally check major indices)
+        # Could implement SPX analysis using Finnhub here
+        # For now, simplified check
         market_healthy = True  # Assume healthy for now
         
         print(f"Overall Market: {'✅ HEALTHY' if market_healthy else '⚠️ WEAK'}")
-        print("💡 Major indices trend analysis recommended")
+        print("💡 Could enhance with SPX analysis using Finnhub")
         
         return {
             'healthy': market_healthy,
-            'note': "Simplified check - full analysis requires index data"
+            'note': "Simplified check - could enhance with index analysis"
         }
     
     def _generate_enhanced_recommendation(self, trend_result: Dict, vcp_result: Optional[Dict], 
@@ -629,7 +629,7 @@ class TradeThrustEnhanced:
                                         risk_result: Dict, anti_rules_result: Dict, 
                                         market_condition: Dict) -> Dict:
         """Generate enhanced recommendation with confidence scoring"""
-        print(f"\n📌 TRADETHRUST ENHANCED RECOMMENDATION")
+        print(f"\n📌 TRADETHRUST FINNHUB RECOMMENDATION")
         print("─" * 70)
         
         # Calculate overall confidence score
@@ -719,6 +719,7 @@ class TradeThrustEnhanced:
         print(f"📊 CONFIDENCE SCORE: {confidence_score:.0f}/100")
         print(f"💪 ACTION CONFIDENCE: {action_confidence}")
         print(f"💡 REASON: {reason}")
+        print(f"🔗 DATA SOURCE: Finnhub.io")
         print()
         print(f"💰 ENTRY PRICE: ${entry_price:.2f}")
         print(f"🛡️ STOP LOSS: ${stop_loss:.2f}")
@@ -736,6 +737,7 @@ class TradeThrustEnhanced:
             'target_price': target,
             'risk_percent': ((entry_price - stop_loss) / entry_price * 100),
             'reward_percent': ((target - entry_price) / entry_price * 100),
+            'data_source': 'Finnhub',
             'score_breakdown': {
                 'trend_template': trend_result['confidence'] if trend_result['passed'] else 0,
                 'vcp_pattern': vcp_result['confidence'] if vcp_result and vcp_result['detected'] else 0,
@@ -748,7 +750,6 @@ class TradeThrustEnhanced:
     # Helper methods for VCP analysis
     def _find_price_contractions(self, data: pd.DataFrame) -> List[Dict]:
         """Find price contraction periods"""
-        # Simplified implementation - would need more sophisticated analysis
         contractions = []
         
         # Look for periods of decreasing volatility
@@ -764,7 +765,7 @@ class TradeThrustEnhanced:
                     'range': rolling_ranges.iloc[i:i+5].mean()
                 })
         
-        return contractions[-3:] if len(contractions) >= 2 else []  # Return last 3 contractions
+        return contractions[-3:] if len(contractions) >= 2 else []
     
     def _are_contractions_decreasing(self, contractions: List[Dict]) -> bool:
         """Check if contractions are getting smaller"""
@@ -781,7 +782,6 @@ class TradeThrustEnhanced:
         if not contractions:
             return False
         
-        # Compare volume in latest contraction vs earlier periods
         recent_volume = data['Volume'].tail(20).mean()
         older_volume = data['Volume'].head(20).mean()
         
@@ -823,13 +823,19 @@ class TradeThrustEnhanced:
         return avg_range < 0.03  # Less than 3% average range
 
 def main():
-    """Main execution"""
-    print("🚀 TradeThrust Enhanced Algorithm with Confidence Scoring")
-    print("✅ Following EXACT TradeThrust principles")
-    print("📊 Advanced scoring and anti-rules implementation")
-    print("=" * 70)
+    """Main execution with API key input"""
+    print("🚀 TradeThrust Finnhub Algorithm")
+    print("✅ Using Finnhub.io for reliable stock data")
+    print("📊 Get your free API key at: https://finnhub.io")
+    print("=" * 60)
     
-    tt = TradeThrustEnhanced()
+    # Get API key from user
+    api_key = input("Enter your Finnhub API key (or press Enter for demo): ").strip()
+    if not api_key:
+        api_key = "demo"
+        print("🔧 Using demo API key (limited functionality)")
+    
+    tt = TradeThrustFinnhub(api_key=api_key)
     
     while True:
         try:

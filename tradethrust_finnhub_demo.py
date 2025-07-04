@@ -1,37 +1,40 @@
 #!/usr/bin/env python3
 """
-TradeThrust Enhanced Demo - EXACT Algorithm with Confidence Scoring
-================================================================
+TradeThrust Finnhub Demo - Clean Professional Implementation
+===========================================================
 
-Demonstrates the enhanced TradeThrust algorithm that follows the EXACT
-specification with confidence scoring and anti-rules implementation.
+Demonstrates the TradeThrust algorithm using Finnhub API with
+confidence scoring and exact algorithm implementation.
 
 Author: TradeThrust Team
 """
 
-from tradethrust_enhanced_final import TradeThrustEnhanced
+from tradethrust_finnhub import TradeThrustFinnhub
 
-def run_enhanced_demo():
-    """Run enhanced TradeThrust demo with confidence scoring"""
-    print("🚀 TradeThrust Enhanced Algorithm - DEMO")
+def run_finnhub_demo():
+    """Run TradeThrust demo using Finnhub API"""
+    print("🚀 TradeThrust Finnhub Algorithm - DEMO")
     print("=" * 70)
+    print("✅ Using Finnhub.io for reliable stock data")
     print("✅ EXACT TradeThrust principles implementation")
     print("✅ Confidence scoring system (0-100)")
-    print("✅ Anti-rules and risk management")
-    print("✅ Enhanced VCP detection")
-    print("✅ Precise breakout confirmation")
+    print("✅ Professional risk management")
+    print("✅ Never crashes, always provides buy price")
     print("=" * 70)
     
-    # Test symbols - mix of different setups
-    test_symbols = ['MSFT', 'AAPL', 'NVDA', 'META', 'GOOGL']
+    # Test symbols - mix of different market conditions
+    test_symbols = ['AAPL', 'MSFT', 'NVDA', 'GOOGL', 'META']
     
-    # Initialize enhanced TradeThrust
-    tt = TradeThrustEnhanced()
+    # Initialize with demo API key
+    print("🔧 Initializing with demo API key...")
+    print("💡 For full functionality, get free API key at https://finnhub.io")
     
-    print(f"\n🧪 Testing {len(test_symbols)} symbols with enhanced algorithm...")
+    tt = TradeThrustFinnhub(api_key="demo")
+    
+    print(f"\n🧪 Testing {len(test_symbols)} symbols with Finnhub data...")
     
     for i, symbol in enumerate(test_symbols, 1):
-        print(f"\n{'='*30} TEST {i}/{len(test_symbols)} {'='*30}")
+        print(f"\n{'='*25} TEST {i}/{len(test_symbols)} {'='*25}")
         
         try:
             result = tt.analyze_stock(symbol)
@@ -42,11 +45,12 @@ def run_enhanced_demo():
             else:
                 # Show enhanced summary with confidence breakdown
                 rec = result['recommendation']
-                print(f"\n🎯 ENHANCED SUMMARY FOR {symbol}:")
+                print(f"\n🎯 FINNHUB SUMMARY FOR {symbol}:")
                 print("─" * 50)
                 print(f"   Recommendation: {rec['action']}")
                 print(f"   Confidence Score: {rec['confidence_score']:.0f}/100")
                 print(f"   Action Confidence: {rec['action_confidence']}")
+                print(f"   Data Source: {rec['data_source']}")
                 print(f"   Entry Price: ${rec['entry_price']:.2f}")
                 print(f"   Stop Loss: ${rec['stop_loss']:.2f}")
                 print(f"   Target: ${rec['target_price']:.2f}")
@@ -65,15 +69,18 @@ def run_enhanced_demo():
             print(f"❌ Error with {symbol}: {e}")
             print("💡 Program continues - no crash!")
     
-    print(f"\n✅ ENHANCED DEMO COMPLETE!")
-    print("💡 Enhanced features demonstrated:")
+    print(f"\n✅ FINNHUB DEMO COMPLETE!")
+    print("💡 Key features demonstrated:")
+    print("   ✅ Finnhub API integration (reliable data source)")
     print("   ✅ EXACT algorithm implementation")
     print("   ✅ Confidence scoring (0-100)")
-    print("   ✅ Anti-rules checking")
-    print("   ✅ Enhanced VCP detection")
-    print("   ✅ Precise breakout confirmation")
     print("   ✅ Professional risk management")
-    print("   ✅ Never crashes, always provides buy price")
+    print("   ✅ Anti-rules checking")
+    print("   ✅ Never crashes, handles all errors gracefully")
+    print("   ✅ Always provides actionable buy/sell prices")
+    print()
+    print("🔗 Get your free Finnhub API key at: https://finnhub.io")
+    print("📚 Full documentation available in repository")
 
 if __name__ == "__main__":
-    run_enhanced_demo()
+    run_finnhub_demo()
