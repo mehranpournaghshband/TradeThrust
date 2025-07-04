@@ -99,6 +99,13 @@ class TradeThrustFinnhub:
                     return None
             else:
                 print(f"   ❌ Finnhub API error: {response.status_code}")
+                if response.status_code == 401:
+                    print(f"   💡 401 = Invalid API key. Check your FINNHUB_API_KEY")
+                elif response.status_code == 403:
+                    print(f"   💡 403 = Access denied. Verify API key at https://finnhub.io/dashboard")
+                elif response.status_code == 429:
+                    print(f"   💡 429 = Rate limited. Wait a moment and try again")
+                print(f"   📄 Response: {response.text}")
                 return None
                 
         except Exception as e:
